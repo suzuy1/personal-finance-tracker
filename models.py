@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
@@ -12,6 +13,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False) # Kolom baru untuk password terenkripsi
     _balance = db.Column('balance', db.Numeric(15, 2), default=0.0) # Protected field
 
     # Getter untuk mengambil saldo dengan aman
@@ -25,6 +27,13 @@ class User(db.Model):
         if amount < 0:
             raise ValueError("Sistem Enterprise: Saldo akun tidak boleh negatif!")
         self._balance = amount
+
+    # Helper Method OOP untuk Enkapsulasi Keamanan Password
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 
 # ====================================================

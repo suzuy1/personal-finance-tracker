@@ -20,25 +20,25 @@
             <i class="fa-solid fa-wallet text-emerald-400 text-xl"></i>
         </div>
         <h3 class="text-3xl font-bold text-white mt-3">Rp {{ "{:,.0f}".format(user.balance) }}</h3>
-        <p class="text-xs text-emerald-400 mt-2 font-medium"><i class="fa-solid fa-check-circle"></i> Akun Terverifikasi</p>
+        <p class="text-xs text-emerald-400 mt-2 font-medium"><i class="fa-solid fa-shield-heart"></i> Dompet Terenkapsulasi</p>
     </div>
 
     <div class="p-6 bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-800 rounded-2xl shadow-xl">
         <div class="flex items-center justify-between text-slate-400">
-            <span class="text-sm font-medium uppercase tracking-wider">Database Mode</span>
-            <i class="fa-solid fa-database text-teal-400 text-xl"></i>
+            <span class="text-sm font-medium uppercase tracking-wider">Total Pemasukan</span>
+            <i class="fa-solid fa-circle-arrow-down text-teal-400 text-xl"></i>
         </div>
-        <h3 class="text-2xl font-bold text-white mt-3">SQLite Local</h3>
-        <p class="text-xs text-slate-400 mt-2">Ready to Enterprise Migration</p>
+        <h3 class="text-3xl font-bold text-teal-400 mt-3">Rp {{ "{:,.0f}".format(total_income) }}</h3>
+        <p class="text-xs text-slate-400 mt-2">Akumulasi Uang Masuk</p>
     </div>
 
     <div class="p-6 bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-800 rounded-2xl shadow-xl">
         <div class="flex items-center justify-between text-slate-400">
-            <span class="text-sm font-medium uppercase tracking-wider">Aktivitas</span>
-            <i class="fa-solid fa-clock-rotate-left text-rose-400 text-xl"></i>
+            <span class="text-sm font-medium uppercase tracking-wider">Total Pengeluaran</span>
+            <i class="fa-solid fa-circle-arrow-up text-rose-400 text-xl"></i>
         </div>
-        <h3 class="text-3xl font-bold text-white mt-3">{{ transactions|length }} <span class="text-lg font-normal text-slate-400">Record</span></h3>
-        <p class="text-xs text-rose-400 mt-2 font-medium">Log Keuangan Terbaca</p>
+        <h3 class="text-3xl font-bold text-rose-400 mt-3">Rp {{ "{:,.0f}".format(total_expense) }}</h3>
+        <p class="text-xs text-slate-400 mt-2">Akumulasi Uang Keluar</p>
     </div>
 </div>
 
@@ -72,12 +72,20 @@
                         </div>
                     </div>
                     
-                    <div class="flex items-center gap-3">
-                        <span class="text-sm font-bold {% if tx.type == 'income' %}text-teal-400{% else %}text-rose-400{% endif %}">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold {% if tx.type == 'income' %}text-teal-400{% else %}text-rose-400{% endif %} mr-2">
                             {% if tx.type == 'income' %}+{% else %}-{% endif %}Rp {{ "{:,.0f}".format(tx.amount) }}
                         </span>
+                        
+                        <a href="{{ url_for('edit_transaction', tx_id=tx.id) }}" 
+                           class="text-slate-500 hover:text-emerald-400 transition p-1" 
+                           title="Edit Catatan">
+                            <i class="fa-solid fa-pen-to-square text-xs"></i>
+                        </a>
+
                         <a href="{{ url_for('delete_transaction', tx_id=tx.id) }}" 
                            class="text-slate-600 hover:text-rose-500 transition p-1" 
+                           title="Hapus Catatan"
                            onclick="return confirm('Apakah Anda yakin ingin menghapus catatan transaksi ini? Saldo akan dikonversi kembali.')">
                             <i class="fa-solid fa-trash-can text-xs"></i>
                         </a>
@@ -92,23 +100,45 @@
 
             </div>
         </div>
-        <a href="#" class="text-center text-sm font-medium text-emerald-400 hover:underline mt-4 block">Lihat Semua Transaksi</a>
+        <a href="{{ url_for('transaction_list') }}" class="text-center text-sm font-medium text-emerald-400 hover:underline mt-4 block">Lihat Semua Transaksi</a>
     </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    // SCRIPT GRAPH TETAP JALAN SEMPADAN
+    // Membaca data tren saldo historis dari Flask ke JavaScript
+    var chartData = {{ chart_data | tojson }};
+    var chartLabels = {{ chart_labels | tojson }};
+
     var options = {
-        series: [{ name: 'Pemasukan', data: [10, 12, 11, 14, 13, {{ transactions|length }}] }],
+        series: [{ name: 'Saldo Kekayaan', data: chartData }],
         chart: { type: 'area', height: 300, toolbar: { show: false }, background: 'transparent' },
         colors: ['#10b981'],
         theme: { mode: 'dark' },
-        stroke: { curve: 'smooth', width: 2 },
+        stroke: { curve: 'smooth', width: 2.5 },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.35,
+                opacityTo: 0.05,
+                stops: [0, 90, 100]
+            }
+        },
         dataLabels: { enabled: false },
-        xaxis: { categories: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'] },
-        grid: { borderColor: '#1e293b' }
+        xaxis: { 
+            categories: chartLabels,
+            labels: { style: { colors: '#94a3b8' } }
+        },
+        yaxis: {
+            labels: { 
+                style: { colors: '#94a3b8' },
+                formatter: function (val) { return "Rp " + val.toLocaleString() }
+            }
+        },
+        grid: { borderColor: '#1e293b' },
+        tooltip: { y: { formatter: function (val) { return "Rp " + val.toLocaleString() } } }
     };
     var chart = new ApexCharts(document.querySelector("#chart-tren"), options);
     chart.render();

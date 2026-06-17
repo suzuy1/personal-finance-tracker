@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Transaksi | FinTrack{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto pt-4">
+    <a href="{{ url_for('dashboard') }}" class="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-emerald-400 transition mb-4">
+        <i class="fa-solid fa-arrow-left"></i> Batal dan Kembali
+    </a>
+    
+    <div class="p-8 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl space-y-6">
+        <div>
+            <h2 class="text-2xl font-bold text-white tracking-tight">Koreksi Catatan Keuangan</h2>
+            <p class="text-sm text-slate-400 mt-1">Perbarui nominal atau keterangan transaksi Anda dengan benar.</p>
+        </div>
+
+        <form action="{{ url_for('edit_transaction', tx_id=tx.id) }}" method="POST" class="space-y-5">
+            <div>
+                <label class="block text-sm font-semibold text-slate-300 mb-2">Jenis Transaksi (Kunci Sistem)</label>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex items-center justify-center gap-2 p-3.5 rounded-xl border {% if tx.type == 'income' %}border-emerald-500/30 bg-emerald-500/5 text-emerald-400{% else %}border-slate-800 bg-slate-950/50 text-slate-500{% endif %}">
+                        <input type="radio" name="type" value="income" class="hidden" {% if tx.type == 'income' %}checked{% endif %}>
+                        <i class="fa-solid fa-circle-arrow-down"></i>
+                        <span class="text-sm font-medium">Pemasukan (Income)</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-center gap-2 p-3.5 rounded-xl border {% if tx.type == 'expense' %}border-rose-500/30 bg-rose-500/5 text-rose-400{% else %}border-slate-800 bg-slate-950/50 text-slate-500{% endif %}">
+                        <input type="radio" name="type" value="expense" class="hidden" {% if tx.type == 'expense' %}checked{% endif %}>
+                        <i class="fa-solid fa-circle-arrow-up"></i>
+                        <span class="text-sm font-medium">Pengeluaran (Expense)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label for="amount" class="block text-sm font-semibold text-slate-300 mb-2">Nominal Baru (Rp)</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none text-slate-500 font-bold">Rp</div>
+                    <input type="number" id="amount" name="amount" value="{{ tx.amount|int }}" required min="1" class="block w-full p-3.5 ps-12 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition">
+                </div>
+            </div>
+
+            <div>
+                <label for="category" class="block text-sm font-semibold text-slate-300 mb-2">Kategori</label>
+                <select id="category" name="category_id" required class="block w-full p-3.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
+                    <option value="1" {% if tx.category == '1' %}selected{% endif %}>💰 Gaji / Pendapatan</option>
+                    <option value="2" {% if tx.category == '2' %}selected{% endif %}>🍔 Makanan & Minuman</option>
+                    <option value="3" {% if tx.category == '3' %}selected{% endif %}>🚗 Transportasi</option>
+                    <option value="4" {% if tx.category == '4' %}selected{% endif %}>🍿 Hiburan / Kebutuhan Hobi</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="description" class="block text-sm font-semibold text-slate-300 mb-2">Keterangan / Catatan</label>
+                <textarea id="description" name="description" rows="3" class="block w-full p-3.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">{{ tx.description }}</textarea>
+            </div>
+
+            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-3.5 rounded-xl transition shadow-lg">
+                Simpan Perubahan Data
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

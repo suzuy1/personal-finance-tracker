@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akses Akun | FinTrack</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>body { font-family: 'Urbanist', sans-serif; }</style>
+</head>
+<body class="bg-slate-950 text-slate-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-md p-8 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl space-y-6">
+        <div class="flex items-center justify-center gap-3 mb-2">
+            <div class="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl">
+                <i class="fa-solid fa-wallet text-2xl"></i>
+            </div>
+            <span class="text-2xl font-bold tracking-tight text-white">FinTrack<span class="text-emerald-400">.</span></span>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="p-4 text-sm {% if category == 'success' %}text-emerald-400 bg-emerald-500/10 border-emerald-500/20{% else %}text-rose-400 bg-rose-500/10 border-rose-500/20{% endif %} border rounded-xl">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="border-b border-slate-800">
+            <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="authTab" role="tablist">
+                <li class="w-1/2" role="presentation">
+                    <button class="inline-block p-4 w-full border-b-2 rounded-t-lg text-emerald-400 border-emerald-500" id="login-tab" data-tabs-target="#login-panel" type="button" role="tab" aria-selected="true">Masuk (Login)</button>
+                </li>
+                <li class="w-1/2" role="presentation">
+                    <button class="inline-block p-4 w-full border-b-2 rounded-t-lg text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-700" id="register-tab" data-tabs-target="#register-panel" type="button" role="tab" aria-selected="false">Daftar Baru</button>
+                </li>
+            </ul>
+        </div>
+
+        <div id="authTabContent">
+            <div class="space-y-4" id="login-panel" role="tabpanel">
+                <form action="{{ url_for('login') }}" method="POST" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Alamat Email</label>
+                        <input type="email" name="email" required class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition" placeholder="nama@email.com">
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-sm font-medium text-slate-300">Password</label>
+                            <a href="{{ url_for('forgot_password') }}" class="text-xs text-emerald-400 hover:underline">Lupa Password?</a>
+                        </div>
+                        <input type="password" name="password" required class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-3 rounded-xl transition mt-2">Masuk ke Dashboard</button>
+                </form>
+            </div>
+
+            <div class="space-y-4 hidden" id="register-panel" role="tabpanel">
+                <form action="{{ url_for('register') }}" method="POST" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Nama Pengguna (Username)</label>
+                        <input type="text" name="username" required class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition" placeholder="orizasaltifa">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Alamat Email</label>
+                        <input type="email" name="email" required class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition" placeholder="nama@email.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Password Baru</label>
+                        <input type="password" name="password" required class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold p-3 rounded-xl border border-slate-700 transition mt-2">Buat Akun FinTrack</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <script>
+        // Tab switching logic
+        const loginTab = document.getElementById('login-tab');
+        const registerTab = document.getElementById('register-tab');
+        const loginPanel = document.getElementById('login-panel');
+        const registerPanel = document.getElementById('register-panel');
+
+        function activateTab(activeTab, inactiveTab, activePanel, inactivePanel) {
+            activePanel.classList.remove('hidden');
+            inactivePanel.classList.add('hidden');
+            activeTab.classList.add('text-emerald-400', 'border-emerald-500');
+            activeTab.classList.remove('text-slate-400', 'border-transparent');
+            inactiveTab.classList.remove('text-emerald-400', 'border-emerald-500');
+            inactiveTab.classList.add('text-slate-400', 'border-transparent');
+        }
+
+        loginTab.addEventListener('click', () => activateTab(loginTab, registerTab, loginPanel, registerPanel));
+        registerTab.addEventListener('click', () => activateTab(registerTab, loginTab, registerPanel, loginPanel));
+    </script>
+</body>
+</html>
