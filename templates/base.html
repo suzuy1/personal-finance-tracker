@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Finance Tracker{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: 'Urbanist', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased dark">
+
+    <aside id="sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 border-r border-slate-800 bg-slate-900">
+        <div class="h-full px-4 py-6 overflow-y-auto flex flex-col justify-between">
+            <div>
+                <div class="flex items-center gap-3 px-2 mb-8">
+                    <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg">
+                        <i class="fa-solid fa-wallet text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight text-white">FinTrack<span class="text-emerald-400">.</span></span>
+                </div>
+
+                <ul class="space-y-2 font-medium">
+                   <li>
+                        <a href="{{ url_for('dashboard') }}" class="flex items-center p-3 text-emerald-400 bg-emerald-500/10 rounded-xl group">
+                            <i class="fa-solid fa-chart-pie w-5 text-lg"></i>
+                            <span class="ms-3">Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center p-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl group transition">
+                            <i class="fa-solid fa-money-bill-transfer w-5 text-lg"></i>
+                            <span class="ms-3">Transaksi</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="p-2 border-t border-slate-800 pt-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-slate-950">
+                        MO
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-white">M. Oriza</p>
+                        <p class="text-xs text-slate-400">User Active</p>
+                    </div>
+                </div>
+                <a href="#" class="text-slate-400 hover:text-rose-400 p-2 rounded-lg transition">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <div class="p-4 sm:ml-64 min-h-screen bg-slate-950">
+        <main class="p-4 max-w-7xl mx-auto space-y-6">
+            <!-- Flash Message Alerts -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="space-y-3">
+                        {% for category, message in messages %}
+                            <div class="p-4 rounded-xl text-sm border {% if category == 'success' %}bg-emerald-500/10 text-emerald-400 border-emerald-500/20{% else %}bg-rose-500/10 text-rose-400 border-rose-500/20{% endif %} flex items-center justify-between transition-all duration-300">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid {% if category == 'success' %}fa-circle-check{% else %}fa-circle-exclamation{% endif %}"></i>
+                                    <span>{{ message }}</span>
+                                </div>
+                                <button type="button" class="text-slate-400 hover:text-white" onclick="this.parentElement.remove()">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

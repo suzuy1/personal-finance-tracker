@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Demo | FinTrack</title>
+    <!-- Tailwind CSS dan Flowbite via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: 'Urbanist', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased dark">
+
+    <!-- SIDEBAR NAVIGASI -->
+    <aside id="sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 border-r border-slate-800 bg-slate-900">
+        <div class="h-full px-4 py-6 overflow-y-auto flex flex-col justify-between">
+            <div>
+                <!-- Logo Aplikasi -->
+                <div class="flex items-center gap-3 px-2 mb-8">
+                    <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg">
+                        <i class="fa-solid fa-wallet text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight text-white">FinTrack<span class="text-emerald-400">.</span></span>
+                </div>
+
+                <!-- Menu Links -->
+                <ul class="space-y-2 font-medium">
+                    <li>
+                        <a href="#" class="flex items-center p-3 text-emerald-400 bg-emerald-500/10 rounded-xl group">
+                            <i class="fa-solid fa-chart-pie w-5 text-lg"></i>
+                            <span class="ms-3">Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center p-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl group transition">
+                            <i class="fa-solid fa-money-bill-transfer w-5 text-lg"></i>
+                            <span class="ms-3">Transaksi</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Profile Bawah -->
+            <div class="p-2 border-t border-slate-800 pt-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-slate-950">
+                        MO
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-white">M. Oriza</p>
+                        <p class="text-xs text-slate-400">User Active</p>
+                    </div>
+                </div>
+                <a href="#" class="text-slate-400 hover:text-rose-400 p-2 rounded-lg transition">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- KONTEN UTAMA (Hasil Gabungan Dashboard) -->
+    <div class="p-4 sm:ml-64 min-h-screen bg-slate-950">
+        <main class="p-4 max-w-7xl mx-auto space-y-6">
+            
+            <!-- WELCOME HEADER -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-white tracking-tight">Halo, Oriza 👋</h1>
+                    <p class="text-slate-400 mt-1">Berikut adalah ringkasan kondisi finansialmu bulan ini.</p>
+                </div>
+                <button class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-semibold px-5 py-2.5 rounded-xl transition flex items-center gap-2 shadow-lg shadow-emerald-500/20">
+                    <i class="fa-solid fa-plus"></i> Tambah Transaksi
+                </button>
+            </div>
+
+            <!-- FINANCIAL CARDS SUMMARY -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                <!-- Card Total Saldo -->
+                <div class="p-6 bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-800 rounded-2xl shadow-xl">
+                    <div class="flex items-center justify-between text-slate-400">
+                        <span class="text-sm font-medium uppercase tracking-wider">Total Kekayaan</span>
+                        <i class="fa-solid fa-wallet text-emerald-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mt-3">Rp 12.500.000</h3>
+                    <p class="text-xs text-emerald-400 mt-2 font-medium"><i class="fa-solid fa-arrow-up"></i> +4.3% dari bulan lalu</p>
+                </div>
+
+                <!-- Card Total Pemasukan -->
+                <div class="p-6 bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-800 rounded-2xl shadow-xl">
+                    <div class="flex items-center justify-between text-slate-400">
+                        <span class="text-sm font-medium uppercase tracking-wider">Pemasukan</span>
+                        <i class="fa-solid fa-circle-arrow-down text-teal-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mt-3">Rp 15.000.000</h3>
+                    <p class="text-xs text-slate-400 mt-2">Bulan Juni 2026</p>
+                </div>
+
+                <!-- Card Total Pengeluaran -->
+                <div class="p-6 bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-800 rounded-2xl shadow-xl">
+                    <div class="flex items-center justify-between text-slate-400">
+                        <span class="text-sm font-medium uppercase tracking-wider">Pengeluaran</span>
+                        <i class="fa-solid fa-circle-arrow-up text-rose-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mt-3">Rp 2.500.000</h3>
+                    <p class="text-xs text-rose-400 mt-2 font-medium"><i class="fa-solid fa-triangle-exclamation"></i> Sudah 16% dari limit</p>
+                </div>
+            </div>
+
+            <!-- GRID UNTUK GRAFIK DAN RIWAYAT -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                <!-- Grafik Arus Kas -->
+                <div class="lg:col-span-2 p-6 bg-slate-900 border border-slate-800 rounded-2xl">
+                    <h4 class="text-lg font-bold text-white mb-4">Tren Keuangan</h4>
+                    <div id="chart-tren"></div>
+                </div>
+
+                <!-- Riwayat Transaksi -->
+                <div class="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-lg font-bold text-white mb-4">Transaksi Terakhir</h4>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-3 bg-slate-950 rounded-xl border border-slate-800/50">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2.5 bg-rose-500/10 text-rose-400 rounded-lg"><i class="fa-solid fa-utensils"></i></div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-white">Makan Siang Bakso</p>
+                                        <p class="text-xs text-slate-400">Makanan • Hari ini</p>
+                                    </div>
+                                </div>
+                                <span class="text-sm font-bold text-rose-400">-Rp 35.000</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-slate-950 rounded-xl border border-slate-800/50">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2.5 bg-teal-500/10 text-teal-400 rounded-lg"><i class="fa-solid fa-laptop-code"></i></div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-white">Gaji Project Web</p>
+                                        <p class="text-xs text-slate-400">Freelance • 14 Jun</p>
+                                    </div>
+                                </div>
+                                <span class="text-sm font-bold text-teal-400">+Rp 2.500.000</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#" class="text-center text-sm font-medium text-emerald-400 hover:underline mt-4 block">Lihat Semua Transaksi</a>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        var options = {
+            series: [{ name: 'Pemasukan', data: [10, 12, 11, 14, 13, 15] }, { name: 'Pengeluaran', data: [2, 3, 4, 3, 2, 2.5] }],
+            chart: { type: 'area', height: 300, toolbar: { show: false }, background: 'transparent' },
+            colors: ['#10b981', '#f43f5e'],
+            theme: { mode: 'dark' },
+            stroke: { curve: 'smooth', width: 2 },
+            dataLabels: { enabled: false },
+            xaxis: { categories: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'] },
+            grid: { borderColor: '#1e293b' }
+        };
+        var chart = new ApexCharts(document.querySelector("#chart-tren"), options);
+        chart.render();
+    </script>
+</body>
+</html>
