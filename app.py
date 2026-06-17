@@ -1,4 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response
+import csv
+import io
 from models import db, User, Income, Expense, Transaction
 from config import Config
 
@@ -9,6 +11,14 @@ db.init_app(app)
 @app.before_request
 def initialize_database():
     db.create_all() # Otomatis update skema tabel SQLite nambah kolom password_hash
+    
+    # Proteksi Session Tampering / Invalidation setelah database dihapus/di-reset
+    user_id = session.get('user_id')
+    if user_id:
+        user = User.query.get(user_id)
+        if not user:
+            session.pop('user_id', None) # Bersihkan sesi kadaluarsa
+            flash('Sesi Anda tidak valid atau akun telah dihapus. Silakan login kembali.', 'error')
 
 # ==========================================
 # CONTROLLER 1: AUTHENTICATION (LOGIN, REGISTER, LOGOUT)
@@ -142,6 +152,12 @@ def dashboard():
         chart_data = [item[1] for item in history]
         chart_labels = [item[0] for item in history]
         
+    # Hitung persentase pemakaian budget
+    budget_limit = float(current_user.budget_limit)
+    budget_percentage = (total_expense / budget_limit) * 100 if budget_limit > 0 else 0
+    if budget_percentage > 100: 
+        budget_percentage = 100
+        
     return render_template(
         'dashboard.html', 
         user=current_user, 
@@ -149,7 +165,8 @@ def dashboard():
         total_income=total_income,
         total_expense=total_expense,
         chart_data=chart_data,
-        chart_labels=chart_labels
+        chart_labels=chart_labels,
+        budget_percentage=round(budget_percentage, 1)
     )
 
 # [READ ALL] - Halaman Khusus Riwayat Transaksi Lengkap
@@ -271,6 +288,62 @@ def edit_transaction(tx_id):
 
     # GET: Tampilkan halaman edit dengan membawa data lama (Auto-fill)
     return render_template('edit_transaction.html', tx=tx)
+
+# FITUR PREMIUM 1: Update Limit Budget bulanan
+@app.route('/update-budget', methods=['POST'])
+def update_budget():
+    if 'user_id' not in session:
+        return redirect(url_for('auth_page'))
+    
+    current_user = User.query.get(session['user_id'])
+    new_budget = request.form.get('budget_limit')
+    
+    if new_budget:
+        try:
+            budget_val = float(new_budget)
+            if budget_val < 0:
+                flash('Batas anggaran tidak boleh negatif!', 'error')
+                return redirect(url_for('dashboard'))
+            current_user.budget_limit = budget_val
+            db.session.commit()
+            flash('Batas anggaran berhasil diperbarui.', 'success')
+        except ValueError:
+            flash('Nominal anggaran tidak valid!', 'error')
+        
+    return redirect(url_for('dashboard'))
+
+# FITUR PREMIUM 2: Export Data Transaksi ke File CSV (Excel)
+@app.route('/transactions/export')
+def export_csv():
+    if 'user_id' not in session:
+        return redirect(url_for('auth_page'))
+        
+    current_user = User.query.get(session['user_id'])
+    user_transactions = Transaction.query.filter_by(user_id=current_user.id).order_by(Transaction.created_at.desc()).all()
+    
+    # Menggunakan io.StringIO dan csv.writer untuk menangani karakter koma atau baris baru pada deskripsi secara aman
+    output_stream = io.StringIO()
+    writer = csv.writer(output_stream, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    
+    # Tulis header CSV
+    writer.writerow(["Tanggal", "Keterangan", "Kategori ID", "Jenis", "Nominal"])
+    
+    # Tulis baris data
+    for tx in user_transactions:
+        jenis = "Pemasukan" if tx.type == 'income' else "Pengeluaran"
+        writer.writerow([
+            tx.created_at.strftime('%Y-%m-%d'),
+            tx.description if tx.description else 'Tanpa keterangan',
+            tx.category,
+            jenis,
+            float(tx.amount)
+        ])
+    
+    # Bungkus response sebagai file unduhan
+    response = make_response(output_stream.getvalue())
+    response.headers["Content-Disposition"] = f"attachment; filename=Laporan_Finansial_{current_user.username}.csv"
+    response.headers["Content-type"] = "text/csv"
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)

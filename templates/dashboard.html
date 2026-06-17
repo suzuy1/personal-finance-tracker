@@ -32,13 +32,30 @@
         <p class="text-xs text-slate-400 mt-2">Akumulasi Uang Masuk</p>
     </div>
 
-    <div class="p-6 bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-800 rounded-2xl shadow-xl">
-        <div class="flex items-center justify-between text-slate-400">
-            <span class="text-sm font-medium uppercase tracking-wider">Total Pengeluaran</span>
-            <i class="fa-solid fa-circle-arrow-up text-rose-400 text-xl"></i>
+    <div class="p-6 bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-800 rounded-2xl shadow-xl flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between text-slate-400">
+                <span class="text-sm font-medium uppercase tracking-wider">Total Pengeluaran</span>
+                <button onclick="let b = prompt('Masukkan Limit Anggaran Baru (Rp):', '{{ user.budget_limit|int }}'); if(b){ document.getElementById('b_form_input').value=b; document.getElementById('b_form').submit(); }" class="text-xs text-emerald-400 hover:underline">
+                    <i class="fa-solid fa-pen-to-square"></i> Set Limit
+                </button>
+            </div>
+            <h3 class="text-3xl font-bold text-rose-400 mt-3">Rp {{ "{:,.0f}".format(total_expense) }}</h3>
         </div>
-        <h3 class="text-3xl font-bold text-rose-400 mt-3">Rp {{ "{:,.0f}".format(total_expense) }}</h3>
-        <p class="text-xs text-slate-400 mt-2">Akumulasi Uang Keluar</p>
+        
+        <div class="mt-4">
+            <div class="flex justify-between text-xs text-slate-400 mb-1">
+                <span>Sudah terpakai {{ budget_percentage }}%</span>
+                <span>Limit: Rp {{ "{:,.0f}".format(user.budget_limit) }}</span>
+            </div>
+            <div class="w-full bg-slate-950 rounded-full h-2 border border-slate-800">
+                <div class="h-1.5 rounded-full {% if budget_percentage >= 80 %}bg-rose-500 shadow-lg shadow-rose-500/50{% else %}bg-emerald-400 shadow-lg shadow-emerald-400/50{% endif %}" style="width: {{ budget_percentage }}%"></div>
+            </div>
+        </div>
+
+        <form id="b_form" action="{{ url_for('update_budget') }}" method="POST" class="hidden">
+            <input type="hidden" id="b_form_input" name="budget_limit">
+        </form>
     </div>
 </div>
 

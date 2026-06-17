@@ -15,6 +15,9 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False) # Kolom baru untuk password terenkripsi
     _balance = db.Column('balance', db.Numeric(15, 2), default=0.0) # Protected field
+    
+    # KOLOM BARU: Batas Anggaran Pengeluaran (Default: Rp 5 Juta)
+    budget_limit = db.Column(db.Numeric(15, 2), default=5000000.0)
 
     # Getter untuk mengambil saldo dengan aman
     @property
