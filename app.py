@@ -345,5 +345,113 @@ def export_csv():
     response.headers["Content-type"] = "text/csv"
     return response
 
+# ==========================================
+# FITUR MODERN: API ENDPOINTS FOR SEARCH & FILTER
+# ==========================================
+
+@app.route('/api/transactions/search')
+def search_transactions():
+    if 'user_id' not in session:
+        return {"error": "Unauthorized"}, 401
+    
+    current_user = User.query.get(session['user_id'])
+    
+    # Parameter pencarian
+    search_query = request.args.get('q', '')
+    tx_type = request.args.get('type', '')
+    category = request.args.get('category', '')
+    start_date = request.args.get('start_date', '')
+    end_date = request.args.get('end_date', '')
+    sort_by = request.args.get('sort', 'date_desc')
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    
+    # Base query
+    query = Transaction.query.filter_by(user_id=current_user.id)
+    
+    # Filter pencarian
+    if search_query:
+        query = query.filter(
+            (Transaction.description.ilike(f'%{search_query}%')) |
+            (Transaction.category.ilike(f'%{search_query}%'))
+        )
+    
+    # Filter berdasarkan tipe
+    if tx_type:
+        query = query.filter(Transaction.type == tx_type)
+    
+    # Filter berdasarkan kategori
+    if category:
+        query = query.filter(Transaction.category == category)
+    
+    # Filter berdasarkan tanggal
+    if start_date:
+        query = query.filter(Transaction.created_at >= start_date)
+    if end_date:
+        query = query.filter(Transaction.created_at <= end_date + ' 23:59:59')
+    
+    # Sorting
+    if sort_by == 'date_desc':
+        query = query.order_by(Transaction.created_at.desc())
+    elif sort_by == 'date_asc':
+        query = query.order_by(Transaction.created_at.asc())
+    elif sort_by == 'amount_desc':
+        query = query.order_by(Transaction.amount.desc())
+    elif sort_by == 'amount_asc':
+        query = query.order_by(Transaction.amount.asc())
+    
+    # Pagination
+    paginated_transactions = query.paginate(page=page, per_page=per_page, error_out=False)
+    
+    # Konversi ke list of dicts
+    transactions = []
+    for tx in paginated_transactions.items:
+        transactions.append({
+            'id': tx.id,
+            'type': tx.type,
+            'amount': float(tx.amount),
+            'category': tx.category,
+            'description': tx.description or 'Tanpa keterangan',
+            'created_at': tx.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        })
+    
+    return {
+        'transactions': transactions,
+        'total': paginated_transactions.total,
+        'pages': paginated_transactions.pages,
+        'current_page': page,
+        'has_next': paginated_transactions.has_next,
+        'has_prev': paginated_transactions.has_prev
+    }
+
+@app.route('/api/transactions/bulk', methods=['POST'])
+def bulk_delete_transactions():
+    if 'user_id' not in session:
+        return {"error": "Unauthorized"}, 401
+    
+    current_user = User.query.get(session['user_id'])
+    data = request.get_json()
+    transaction_ids = data.get('transaction_ids', [])
+    
+    if not transaction_ids:
+        return {"error": "Tidak ada transaksi yang dipilih"}, 400
+    
+    try:
+        deleted_count = 0
+        for tx_id in transaction_ids:
+            tx = Transaction.query.filter_by(id=tx_id, user_id=current_user.id).first()
+            if tx:
+                # Reverse logic untuk membalikkan efek keuangan
+                new_balance = tx.execute_reverse_logic(current_user.balance)
+                current_user.balance = new_balance
+                db.session.delete(tx)
+                deleted_count += 1
+        
+        db.session.commit()
+        return {"success": True, "deleted": deleted_count}
+    except Exception as e:
+        db.session.rollback()
+        return {"error": f"Gagal menghapus transaksi: {str(e)}"}, 400
+
 if __name__ == '__main__':
     app.run(debug=True)

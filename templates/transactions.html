@@ -19,11 +19,127 @@
         </div>
     </div>
 
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+    <!-- Statistics Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-4 bg-slate-900 border border-slate-800 rounded-xl">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-slate-400">Total Transaksi</p>
+                    <h3 class="text-2xl font-bold text-white">{{ transactions|length }}</h3>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center">
+                    <i class="fa-solid fa-receipt text-slate-400"></i>
+                </div>
+            </div>
+        </div>
+        <div class="p-4 bg-slate-900 border border-slate-800 rounded-xl">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-slate-400">Total Pemasukan</p>
+                    <h3 class="text-2xl font-bold text-teal-400">Rp {{ "{:,.0f}".format(transactions|selectattr('type', 'eq', 'income')|map(attribute='amount')|sum) }}</h3>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-teal-500/10 flex items-center justify-center">
+                    <i class="fa-solid fa-arrow-down text-teal-400"></i>
+                </div>
+            </div>
+        </div>
+        <div class="p-4 bg-slate-900 border border-slate-800 rounded-xl">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-slate-400">Total Pengeluaran</p>
+                    <h3 class="text-2xl font-bold text-rose-400">Rp {{ "{:,.0f}".format(transactions|selectattr('type', 'eq', 'expense')|map(attribute='amount')|sum) }}</h3>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-rose-500/10 flex items-center justify-center">
+                    <i class="fa-solid fa-arrow-up text-rose-400"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-slate-300 mb-2">Cari Transaksi</label>
+                <div class="relative">
+                    <input type="text" id="search-input" placeholder="Cari keterangan, kategori..." class="block w-full p-3 pl-10 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
+                    <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-2">Jenis Transaksi</label>
+                <select id="filter-type" class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
+                    <option value="">Semua Jenis</option>
+                    <option value="income">Pemasukan</option>
+                    <option value="expense">Pengeluaran</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-2">Kategori</label>
+                <select id="filter-category" class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
+                    <option value="">Semua Kategori</option>
+                    <option value="1">💰 Gaji / Pendapatan</option>
+                    <option value="2">🍔 Makanan & Minuman</option>
+                    <option value="3">🚗 Transportasi</option>
+                    <option value="4">🍿 Hiburan / Kebutuhan Hobi</option>
+                </select>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-2">Tanggal Mulai</label>
+                <input type="date" id="filter-start-date" class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-2">Tanggal Akhir</label>
+                <input type="date" id="filter-end-date" class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-2">Urutkan</label>
+                <select id="sort-by" class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
+                    <option value="date_desc">Tanggal (Terbaru)</option>
+                    <option value="date_asc">Tanggal (Terlama)</option>
+                    <option value="amount_desc">Nominal (Tertinggi)</option>
+                    <option value="amount_asc">Nominal (Terendah)</option>
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button id="apply-filters" class="w-full p-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-xl transition">
+                    Terapkan Filter
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Toggle and Bulk Actions -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex items-center gap-2">
+            <button id="view-list" class="p-2 bg-slate-800 rounded-lg border border-slate-700 text-emerald-400">
+                <i class="fa-solid fa-list"></i>
+            </button>
+            <button id="view-card" class="p-2 bg-slate-800 rounded-lg border border-slate-700 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-grip"></i>
+            </button>
+        </div>
+        <div id="bulk-actions" class="hidden">
+            <div class="flex items-center gap-2">
+                <span id="selected-count" class="text-sm text-slate-400">0 dipilih</span>
+                <button id="bulk-delete" class="px-4 py-2 bg-rose-500/10 text-rose-400 rounded-lg border border-rose-500/20 hover:bg-rose-500/20 transition">
+                    <i class="fa-solid fa-trash mr-1"></i> Hapus Terpilih
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction List View -->
+    <div id="list-view" class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left text-slate-300">
                 <thead class="text-xs uppercase bg-slate-950 text-slate-400 border-b border-slate-800">
                     <tr>
+                        <th scope="col" class="px-6 py-4">
+                            <input type="checkbox" id="select-all" class="rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-emerald-500">
+                        </th>
                         <th scope="col" class="px-6 py-4">Tanggal</th>
                         <th scope="col" class="px-6 py-4">Keterangan / Catatan</th>
                         <th scope="col" class="px-6 py-4">Kategori</th>
@@ -32,9 +148,12 @@
                         <th scope="col" class="px-6 py-4 text-center">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-800/60">
+                <tbody id="transactions-table" class="divide-y divide-slate-800/60">
                     {% for tx in transactions %}
-                    <tr class="hover:bg-slate-850/50 transition">
+                    <tr class="hover:bg-slate-850/50 transition transaction-row" data-id="{{ tx.id }}">
+                        <td class="px-6 py-4">
+                            <input type="checkbox" class="transaction-checkbox rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-emerald-500" data-id="{{ tx.id }}">
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-slate-400">
                             {{ tx.created_at.strftime('%d %B %Y') }}
                         </td>
@@ -73,7 +192,7 @@
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" class="text-center py-12 text-slate-500">
+                        <td colspan="7" class="text-center py-12 text-slate-500">
                             <i class="fa-solid fa-folder-open text-4xl mb-3 block"></i>
                             <p class="text-base font-medium">Belum ada rekaman transaksi data.</p>
                         </td>
@@ -83,5 +202,390 @@
             </table>
         </div>
     </div>
+
+    <!-- Transaction Card View (Hidden by default) -->
+    <div id="card-view" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for tx in transactions %}
+        <div class="p-4 bg-slate-900 border border-slate-800 rounded-xl hover:border-slate-700 transition transaction-card" data-id="{{ tx.id }}">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" class="transaction-checkbox rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-emerald-500" data-id="{{ tx.id }}">
+                    <span class="text-xs text-slate-400">{{ tx.created_at.strftime('%d %b %Y') }}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <a href="{{ url_for('edit_transaction', tx_id=tx.id) }}" class="p-1.5 text-slate-400 hover:text-emerald-400 transition">
+                        <i class="fa-solid fa-pen-to-square text-xs"></i>
+                    </a>
+                    <a href="{{ url_for('delete_transaction', tx_id=tx.id) }}" class="p-1.5 text-slate-500 hover:text-rose-500 transition" onclick="return confirm('Hapus transaksi ini?')">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="mb-3">
+                <p class="text-sm font-semibold text-white">{{ tx.description if tx.description else 'Tanpa keterangan' }}</p>
+                <p class="text-xs text-slate-400 mt-1">
+                    {% if tx.category == '1' %}💰 Gaji
+                    {% elif tx.category == '2' %}🍔 Makanan
+                    {% elif tx.category == '3' %}🚗 Transportasi
+                    {% elif tx.category == '4' %}🍿 Hiburan
+                    {% else %}{{ tx.category }}
+                    {% endif %}
+                </p>
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="px-2 py-1 text-xs font-medium rounded-lg {% if tx.type == 'income' %}bg-teal-500/10 text-teal-400 border border-teal-500/20{% else %}bg-rose-500/10 text-rose-400 border border-rose-500/20{% endif %}">
+                    {{ 'Masuk' if tx.type == 'income' else 'Keluar' }}
+                </span>
+                <span class="text-sm font-bold {% if tx.type == 'income' %}text-teal-400{% else %}text-rose-400{% endif %}">
+                    {% if tx.type == 'income' %}+{% else %}-{% endif %}Rp {{ "{:,.0f}".format(tx.amount) }}
+                </span>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-span-full text-center py-12 text-slate-500">
+            <i class="fa-solid fa-folder-open text-4xl mb-3 block"></i>
+            <p class="text-base font-medium">Belum ada rekaman transaksi data.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" class="hidden text-center py-6">
+        <div class="inline-flex items-center gap-2 text-slate-400">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>Memuat transaksi...</span>
+        </div>
+    </div>
 </div>
+
+<style>
+    .transaction-row.selected, .transaction-card.selected {
+        @apply bg-emerald-500/5 border-emerald-500/20;
+    }
+    .view-active {
+        @apply text-emerald-400 border-emerald-500;
+    }
+    .view-inactive {
+        @apply text-slate-400 border-slate-700 hover:text-white;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const listView = document.getElementById('list-view');
+        const cardView = document.getElementById('card-view');
+        const viewListBtn = document.getElementById('view-list');
+        const viewCardBtn = document.getElementById('view-card');
+        const searchInput = document.getElementById('search-input');
+        const filterType = document.getElementById('filter-type');
+        const filterCategory = document.getElementById('filter-category');
+        const filterStartDate = document.getElementById('filter-start-date');
+        const filterEndDate = document.getElementById('filter-end-date');
+        const sortBy = document.getElementById('sort-by');
+        const applyFiltersBtn = document.getElementById('apply-filters');
+        const selectAllCheckbox = document.getElementById('select-all');
+        const bulkActions = document.getElementById('bulk-actions');
+        const selectedCount = document.getElementById('selected-count');
+        const bulkDeleteBtn = document.getElementById('bulk-delete');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const transactionsTable = document.getElementById('transactions-table');
+
+        let viewMode = 'list';
+        let selectedIds = new Set();
+
+        // Initialize view
+        updateViewMode();
+
+        // View toggle
+        viewListBtn.addEventListener('click', () => {
+            viewMode = 'list';
+            updateViewMode();
+        });
+
+        viewCardBtn.addEventListener('click', () => {
+            viewMode = 'card';
+            updateViewMode();
+        });
+
+        function updateViewMode() {
+            if (viewMode === 'list') {
+                listView.classList.remove('hidden');
+                cardView.classList.add('hidden');
+                viewListBtn.classList.add('view-active');
+                viewListBtn.classList.remove('view-inactive');
+                viewCardBtn.classList.remove('view-active');
+                viewCardBtn.classList.add('view-inactive');
+            } else {
+                listView.classList.add('hidden');
+                cardView.classList.remove('hidden');
+                viewCardBtn.classList.add('view-active');
+                viewCardBtn.classList.remove('view-inactive');
+                viewListBtn.classList.remove('view-active');
+                viewListBtn.classList.add('view-inactive');
+            }
+        }
+
+        // Search and filter functionality
+        async function applyFilters() {
+            loadingIndicator.classList.remove('hidden');
+            
+            const params = new URLSearchParams({
+                q: searchInput.value,
+                type: filterType.value,
+                category: filterCategory.value,
+                start_date: filterStartDate.value,
+                end_date: filterEndDate.value,
+                sort: sortBy.value
+            });
+            
+            try {
+                const response = await fetch(`/api/transactions/search?${params}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                
+                // Update views with new data
+                updateListView(data.transactions);
+                updateCardView(data.transactions);
+                
+            } catch (error) {
+                console.error('Error fetching transactions:', error);
+                alert('Gagal memuat transaksi. Silakan coba lagi.');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+
+        function updateListView(transactions) {
+            transactionsTable.innerHTML = '';
+            
+            if (transactions.length === 0) {
+                transactionsTable.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-12 text-slate-500">
+                            <i class="fa-solid fa-folder-open text-4xl mb-3 block"></i>
+                            <p class="text-base font-medium">Tidak ada transaksi yang ditemukan.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            transactions.forEach(tx => {
+                const row = createTableRow(tx);
+                transactionsTable.appendChild(row);
+            });
+        }
+
+        function updateCardView(transactions) {
+            const cardView = document.getElementById('card-view');
+            cardView.innerHTML = '';
+            
+            if (transactions.length === 0) {
+                cardView.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-slate-500">
+                        <i class="fa-solid fa-folder-open text-4xl mb-3 block"></i>
+                        <p class="text-base font-medium">Tidak ada transaksi yang ditemukan.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            transactions.forEach(tx => {
+                const card = createTransactionCard(tx);
+                cardView.appendChild(card);
+            });
+        }
+
+        function createTableRow(tx) {
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-slate-850/50 transition transaction-row';
+            row.dataset.id = tx.id;
+            
+            const categoryText = getCategoryText(tx.category);
+            const typeClass = tx.type === 'income' ? 'text-teal-400' : 'text-rose-400';
+            const typeBadge = tx.type === 'income' 
+                ? '<span class="px-2.5 py-1 text-xs font-medium rounded-lg bg-teal-500/10 text-teal-400 border border-teal-500/20">Masuk</span>'
+                : '<span class="px-2.5 py-1 text-xs font-medium rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20">Keluar</span>';
+            const sign = tx.type === 'income' ? '+' : '-';
+            const formattedAmount = new Intl.NumberFormat('id-ID').format(tx.amount);
+            const date = new Date(tx.created_at);
+            const formattedDate = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            
+            row.innerHTML = `
+                <td class="px-6 py-4">
+                    <input type="checkbox" class="transaction-checkbox rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-emerald-500" data-id="${tx.id}">
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-slate-400">
+                    ${formattedDate}
+                </td>
+                <td class="px-6 py-4 font-semibold text-white">
+                    ${tx.description}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    ${categoryText}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    ${typeBadge}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap font-bold ${typeClass}">
+                    ${sign}Rp ${formattedAmount}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <div class="flex items-center justify-center gap-3">
+                        <a href="/transaction/edit/${tx.id}" class="text-slate-400 hover:text-emerald-400 transition" title="Edit">
+                            <i class="fa-solid fa-pen-to-square text-base"></i>
+                        </a>
+                        <a href="/transaction/delete/${tx.id}" class="text-slate-500 hover:text-rose-500 transition" title="Hapus"
+                           onclick="return confirm('Apakah Anda yakin ingin menghapus transaksi ini? Saldo akan dikonversi kembali.')">
+                            <i class="fa-solid fa-trash-can text-base"></i>
+                        </a>
+                    </div>
+                </td>
+            `;
+            
+            return row;
+        }
+
+        function createTransactionCard(tx) {
+            const card = document.createElement('div');
+            card.className = 'p-4 bg-slate-900 border border-slate-800 rounded-xl hover:border-slate-700 transition transaction-card';
+            card.dataset.id = tx.id;
+            
+            const categoryText = getCategoryText(tx.category);
+            const typeClass = tx.type === 'income' ? 'text-teal-400' : 'text-rose-400';
+            const typeBadge = tx.type === 'income' 
+                ? '<span class="px-2 py-1 text-xs font-medium rounded-lg bg-teal-500/10 text-teal-400 border border-teal-500/20">Masuk</span>'
+                : '<span class="px-2 py-1 text-xs font-medium rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20">Keluar</span>';
+            const sign = tx.type === 'income' ? '+' : '-';
+            const formattedAmount = new Intl.NumberFormat('id-ID').format(tx.amount);
+            const date = new Date(tx.created_at);
+            const formattedDate = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+            
+            card.innerHTML = `
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" class="transaction-checkbox rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-emerald-500" data-id="${tx.id}">
+                        <span class="text-xs text-slate-400">${formattedDate}</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <a href="/transaction/edit/${tx.id}" class="p-1.5 text-slate-400 hover:text-emerald-400 transition">
+                            <i class="fa-solid fa-pen-to-square text-xs"></i>
+                        </a>
+                        <a href="/transaction/delete/${tx.id}" class="p-1.5 text-slate-500 hover:text-rose-500 transition" onclick="return confirm('Hapus transaksi ini?')">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <p class="text-sm font-semibold text-white">${tx.description}</p>
+                    <p class="text-xs text-slate-400 mt-1">${categoryText}</p>
+                </div>
+                <div class="flex items-center justify-between">
+                    ${typeBadge}
+                    <span class="text-sm font-bold ${typeClass}">
+                        ${sign}Rp ${formattedAmount}
+                    </span>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function getCategoryText(category) {
+            const categories = {
+                '1': '💰 Gaji / Pendapatan',
+                '2': '🍔 Makanan & Minuman',
+                '3': '🚗 Transportasi',
+                '4': '🍿 Hiburan / Kebutuhan Hobi'
+            };
+            return categories[category] || category;
+        }
+
+        // Event listeners
+        applyFiltersBtn.addEventListener('click', applyFilters);
+        searchInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') applyFilters();
+        });
+
+        // Bulk selection
+        selectAllCheckbox.addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.transaction-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+                const id = checkbox.dataset.id;
+                if (this.checked) {
+                    selectedIds.add(id);
+                } else {
+                    selectedIds.delete(id);
+                }
+            });
+            updateBulkActions();
+        });
+
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('transaction-checkbox')) {
+                const id = e.target.dataset.id;
+                if (e.target.checked) {
+                    selectedIds.add(id);
+                } else {
+                    selectedIds.delete(id);
+                }
+                updateBulkActions();
+            }
+        });
+
+        function updateBulkActions() {
+            const count = selectedIds.size;
+            selectedCount.textContent = `${count} dipilih`;
+            
+            if (count > 0) {
+                bulkActions.classList.remove('hidden');
+                bulkActions.classList.add('flex');
+            } else {
+                bulkActions.classList.add('hidden');
+                bulkActions.classList.remove('flex');
+            }
+            
+            // Highlight selected items
+            document.querySelectorAll('.transaction-row, .transaction-card').forEach(el => {
+                if (selectedIds.has(el.dataset.id)) {
+                    el.classList.add('selected');
+                } else {
+                    el.classList.remove('selected');
+                }
+            });
+        }
+
+        // Bulk delete
+        bulkDeleteBtn.addEventListener('click', async function() {
+            if (selectedIds.size === 0) return;
+            
+            if (!confirm(`Hapus ${selectedIds.size} transaksi yang dipilih?`)) return;
+            
+            try {
+                const response = await fetch('/api/transactions/bulk', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ transaction_ids: Array.from(selectedIds) })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`${result.deleted} transaksi berhasil dihapus.`);
+                    location.reload();
+                } else {
+                    alert('Gagal menghapus transaksi: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error deleting transactions:', error);
+                alert('Terjadi kesalahan saat menghapus transaksi');
+            }
+        });
+    });
+</script>
 {% endblock %}
