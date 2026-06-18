@@ -14,14 +14,23 @@
 </head>
 <body class="bg-slate-950 text-slate-100 antialiased dark">
 
-    <aside id="sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 border-r border-slate-800 bg-slate-900">
+    <!-- Overlay untuk mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden" onclick="toggleSidebar()"></div>
+
+    <aside id="sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full md:translate-x-0 border-r border-slate-800 bg-slate-900">
         <div class="h-full px-4 py-6 overflow-y-auto flex flex-col justify-between">
             <div>
-                <div class="flex items-center gap-3 px-2 mb-8">
-                    <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg">
-                        <i class="fa-solid fa-wallet text-xl"></i>
+                <div class="flex items-center justify-between px-2 mb-8">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg">
+                            <i class="fa-solid fa-wallet text-xl"></i>
+                        </div>
+                        <span class="text-xl font-bold tracking-tight text-white">FinTrack<span class="text-emerald-400">.</span></span>
                     </div>
-                    <span class="text-xl font-bold tracking-tight text-white">FinTrack<span class="text-emerald-400">.</span></span>
+                    <!-- Tombol close untuk mobile -->
+                    <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white md:hidden p-2 rounded-lg hover:bg-slate-800">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
                 </div>
 
                 <ul class="space-y-2 font-medium">
@@ -57,7 +66,25 @@
         </div>
     </aside>
 
-    <div class="p-4 sm:ml-64 min-h-screen bg-slate-950">
+    <!-- Header mobile dengan hamburger -->
+    <div class="md:hidden fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition">
+                <i class="fa-solid fa-bars text-lg"></i>
+            </button>
+            <div class="flex items-center gap-2">
+                <div class="p-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg">
+                    <i class="fa-solid fa-wallet text-sm"></i>
+                </div>
+                <span class="font-bold text-white">FinTrack<span class="text-emerald-400">.</span></span>
+            </div>
+        </div>
+        <a href="{{ url_for('logout') }}" class="text-slate-400 hover:text-rose-400 p-2 rounded-lg hover:bg-slate-800 transition">
+            <i class="fa-solid fa-right-from-bracket"></i>
+        </a>
+    </div>
+
+    <div class="p-4 pt-16 md:pt-4 md:ml-64 min-h-screen bg-slate-950">
         <main class="p-4 max-w-7xl mx-auto space-y-6">
             <!-- Flash Message Alerts -->
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -85,6 +112,48 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    
+    <script>
+        // Toggle Sidebar Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                // Buka sidebar
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Prevent scroll
+            } else {
+                // Tutup sidebar
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Tutup sidebar jika resize ke desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) { // md breakpoint
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Tutup sidebar dengan Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const sidebar = document.getElementById('sidebar');
+                if (!sidebar.classList.contains('-translate-x-full')) {
+                    toggleSidebar();
+                }
+            }
+        });
+    </script>
+    
     {% block scripts %}{% endblock %}
 </body>
 </html>
