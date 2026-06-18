@@ -92,18 +92,21 @@ def register():
 @app.route('/login', methods=['POST'])
 @limiter.limit("5 per minute")
 def login():
-    email = request.form.get('email')
+    login_input = request.form.get('login_input')
     password = request.form.get('password')
 
-    user = User.query.filter_by(email=email).first()
+    # Cari user berdasarkan email ATAU username
+    user = User.query.filter(
+        (User.email == login_input) | (User.username == login_input)
+    ).first()
 
     if user and user.check_password(password):
-        logger.info(f'Login berhasil: {user.email} dari IP {request.remote_addr}')
+        logger.info(f'Login berhasil: {user.email} (via {login_input}) dari IP {request.remote_addr}')
         session['user_id'] = user.id # Simpan ID user ke Session Browser
         return redirect(url_for('dashboard'))
     
-    logger.warning(f'Login gagal: {email} dari IP {request.remote_addr}')
-    flash('Email atau password Anda salah!', 'error')
+    logger.warning(f'Login gagal: {login_input} dari IP {request.remote_addr}')
+    flash('Email/username atau password Anda salah!', 'error')
     return redirect(url_for('auth_page'))
 
 @app.route('/logout')
