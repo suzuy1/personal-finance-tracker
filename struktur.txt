@@ -3,12 +3,7 @@
 ├── config.py
 ├── instance
 │   └── finance.db
-├── models
-│   └── finance.py
 ├── models.py
-├── __pycache__
-│   ├── config.cpython-312.pyc
-│   └── models.cpython-312.pyc
 ├── README.md
 ├── requirements.txt
 ├── struktur.txt
@@ -19,9 +14,7 @@
     ├── edit_transaction.html
     ├── forgot_password.html
     ├── reset_password.html
-    ├── test_dashboard.html
-    ├── test_transaction.html
     ├── transaction_form.html
     └── transactions.html
 
-5 directories, 20 files
+4 directories, 18 files
