@@ -14,7 +14,13 @@
             <p class="text-sm text-slate-400 mt-1">Silakan masukkan detail pemasukan atau pengeluaran Anda dengan benar.</p>
         </div>
 
-        <form action="{{ url_for('add_transaction') }}" method="POST" class="space-y-5">
+        <!-- Info Saldo Saat Ini -->
+        <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl">
+            <p class="text-xs text-slate-400 mb-1">Saldo Saat Ini</p>
+            <p class="text-xl font-bold text-emerald-400">Rp {{ "{:,.0f}".format(user.balance) }}</p>
+        </div>
+
+        <form action="{{ url_for('add_transaction') }}" method="POST" class="space-y-5" id="transaction-form">
             <div>
                 <label class="block text-sm font-semibold text-slate-300 mb-2">Jenis Transaksi</label>
                 <div class="grid grid-cols-2 gap-4">
@@ -64,4 +70,34 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.getElementById('transaction-form').addEventListener('submit', function(e) {
+        const amount = document.getElementById('amount').value;
+        const type = document.querySelector('input[name="type"]:checked').value;
+        const balance = {{ user.balance }};
+        
+        // Validasi nominal harus lebih dari 0
+        if (!amount || parseFloat(amount) <= 0) {
+            e.preventDefault();
+            alert('Nominal harus lebih dari 0!');
+            return false;
+        }
+        
+        // Validasi saldo jika pengeluaran
+        if (type === 'expense' && parseFloat(amount) > balance) {
+            e.preventDefault();
+            alert('Saldo tidak mencukupi untuk pengeluaran ini!');
+            return false;
+        }
+        
+        // Konfirmasi sebelum submit
+        if (!confirm('Apakah data transaksi sudah benar?')) {
+            e.preventDefault();
+            return false;
+        }
+        
+        return true;
+    });
+</script>
 {% endblock %}

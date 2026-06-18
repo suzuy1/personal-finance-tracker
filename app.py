@@ -231,32 +231,48 @@ def add_transaction():
     if 'user_id' not in session:
         return redirect(url_for('auth_page'))
 
+    current_user = User.query.get(session['user_id'])
+
     if request.method == 'POST':
-        current_user = User.query.get(session['user_id'])
         tx_type = request.form.get('type')
-        amount = float(request.form.get('amount'))
+        amount = request.form.get('amount')
         category = request.form.get('category_id')
         description = request.form.get('description')
 
         try:
+            # Validasi nominal harus angka dan lebih dari 0
+            try:
+                amount_val = float(amount)
+            except (TypeError, ValueError):
+                flash('Nominal harus berupa angka yang valid!', 'error')
+                return redirect(url_for('add_transaction'))
+            
+            if amount_val <= 0:
+                flash('Nominal harus lebih dari 0!', 'error')
+                return redirect(url_for('add_transaction'))
+
             if tx_type == 'income':
-                new_tx = Income(user_id=current_user.id, amount=amount, category=category, description=description)
+                new_tx = Income(user_id=current_user.id, amount=amount_val, category=category, description=description)
             elif tx_type == 'expense':
-                new_tx = Expense(user_id=current_user.id, amount=amount, category=category, description=description)
+                new_tx = Expense(user_id=current_user.id, amount=amount_val, category=category, description=description)
             else:
-                return "Tipe tidak valid", 400
+                flash('Jenis transaksi tidak valid!', 'error')
+                return redirect(url_for('add_transaction'))
 
             current_user.balance = new_tx.execute_financial_logic(current_user.balance)
             
             db.session.add(new_tx)
             db.session.commit()
+            
+            flash('Transaksi berhasil ditambahkan!', 'success')
             return redirect(url_for('dashboard'))
 
         except ValueError as e:
             db.session.rollback()
-            return f"Error: {str(e)}", 400
+            flash(f'Gagal menambah transaksi: {str(e)}', 'error')
+            return redirect(url_for('add_transaction'))
 
-    return render_template('transaction_form.html')
+    return render_template('transaction_form.html', user=current_user)
 
 @app.route('/transaction/delete/<int:tx_id>')
 def delete_transaction(tx_id):
