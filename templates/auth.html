@@ -52,7 +52,12 @@
                             <label class="block text-sm font-medium text-slate-300">Password</label>
                             <a href="{{ url_for('forgot_password') }}" class="text-xs text-emerald-400 hover:underline">Lupa Password?</a>
                         </div>
-                        <input type="password" name="password" required class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition" placeholder="••••••••">
+                        <div class="relative">
+                            <input type="password" name="password" id="login-password" required class="block w-full p-3 pr-10 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition" placeholder="••••••••">
+                            <button type="button" onclick="togglePassword('login-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
                     <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-3 rounded-xl transition mt-2">Masuk ke Dashboard</button>
                 </form>
@@ -70,7 +75,30 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-300 mb-2">Password Baru</label>
-                        <input type="password" name="password" required class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition" placeholder="••••••••">
+                        <div class="relative">
+                            <input type="password" name="password" id="register-password" required class="block w-full p-3 pr-10 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition" placeholder="••••••••">
+                            <button type="button" onclick="togglePassword('register-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        <div id="password-strength" class="mt-2 text-xs hidden">
+                            <div class="flex gap-1 mb-1">
+                                <div id="str1" class="h-1 flex-1 bg-slate-700 rounded"></div>
+                                <div id="str2" class="h-1 flex-1 bg-slate-700 rounded"></div>
+                                <div id="str3" class="h-1 flex-1 bg-slate-700 rounded"></div>
+                                <div id="str4" class="h-1 flex-1 bg-slate-700 rounded"></div>
+                            </div>
+                            <span id="strength-text" class="text-slate-400"></span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Konfirmasi Password</label>
+                        <div class="relative">
+                            <input type="password" name="confirm_password" id="confirm-password" required class="block w-full p-3 pr-10 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition" placeholder="Ulangi password baru">
+                            <button type="button" onclick="togglePassword('confirm-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
                     <button type="submit" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold p-3 rounded-xl border border-slate-700 transition mt-2">Buat Akun FinTrack</button>
                 </form>
@@ -97,6 +125,53 @@
 
         loginTab.addEventListener('click', () => activateTab(loginTab, registerTab, loginPanel, registerPanel));
         registerTab.addEventListener('click', () => activateTab(registerTab, loginTab, registerPanel, loginPanel));
+
+        // Toggle Password Visibility
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // Password Strength Checker
+        const passwordInput = document.querySelector('#register-panel input[name="password"]');
+        const strengthDiv = document.getElementById('password-strength');
+        const strengthText = document.getElementById('strength-text');
+        const bars = ['str1', 'str2', 'str3', 'str4'];
+
+        passwordInput?.addEventListener('input', (e) => {
+            const val = e.target.value;
+            let score = 0;
+            
+            if (val.length >= 8) score++;
+            if (val.length >= 12) score++;
+            if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+            if (/\d/.test(val)) score++;
+            
+            if (val.length > 0) {
+                strengthDiv.classList.remove('hidden');
+                
+                const colors = ['bg-rose-500', 'bg-orange-500', 'bg-yellow-500', 'bg-emerald-500'];
+                const labels = ['Lemah', 'Sedang', 'Kuat', 'Sangat Kuat'];
+                
+                bars.forEach((id, i) => {
+                    const el = document.getElementById(id);
+                    el.className = 'h-1 flex-1 rounded ' + (i < score ? colors[score - 1] : 'bg-slate-700');
+                });
+                
+                strengthText.textContent = score > 0 ? labels[score - 1] : '';
+                strengthText.className = score > 0 ? colors[score - 1].replace('bg-', 'text-') : 'text-slate-400';
+            } else {
+                strengthDiv.classList.add('hidden');
+            }
+        });
     </script>
 </body>
 </html>

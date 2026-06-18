@@ -1,12 +1,27 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response
 import csv
 import io
+import re
+import logging
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from models import db, User, Income, Expense, Transaction
 from config import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Setup rate limiting
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"]
+)
 
 @app.before_request
 def initialize_database():
@@ -35,6 +50,30 @@ def register():
     username = request.form.get('username')
     email = request.form.get('email')
     password = request.form.get('password')
+    confirm_password = request.form.get('confirm_password')
+
+    # Validasi konfirmasi password
+    if password != confirm_password:
+        flash('Password dan konfirmasi password tidak cocok!', 'error')
+        return redirect(url_for('auth_page'))
+
+    # Validasi kekuatan password
+    if len(password) < 8:
+        flash('Password minimal harus 8 karakter!', 'error')
+        return redirect(url_for('auth_page'))
+    
+    if not any(c.isupper() for c in password):
+        flash('Password harus mengandung minimal satu huruf kapital!', 'error')
+        return redirect(url_for('auth_page'))
+    
+    if not any(c.isdigit() for c in password):
+        flash('Password harus mengandung minimal satu angka!', 'error')
+        return redirect(url_for('auth_page'))
+
+    # Validasi format email
+    if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+        flash('Format email tidak valid!', 'error')
+        return redirect(url_for('auth_page'))
 
     if User.query.filter((User.email == email) | (User.username == username)).first():
         flash('Username atau Email sudah terdaftar!', 'error')
@@ -51,6 +90,7 @@ def register():
     return redirect(url_for('auth_page'))
 
 @app.route('/login', methods=['POST'])
+@limiter.limit("5 per minute")
 def login():
     email = request.form.get('email')
     password = request.form.get('password')
@@ -58,9 +98,11 @@ def login():
     user = User.query.filter_by(email=email).first()
 
     if user and user.check_password(password):
+        logger.info(f'Login berhasil: {user.email} dari IP {request.remote_addr}')
         session['user_id'] = user.id # Simpan ID user ke Session Browser
         return redirect(url_for('dashboard'))
     
+    logger.warning(f'Login gagal: {email} dari IP {request.remote_addr}')
     flash('Email atau password Anda salah!', 'error')
     return redirect(url_for('auth_page'))
 
