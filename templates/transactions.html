@@ -20,7 +20,7 @@
     </div>
 
     <!-- Statistics Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <div class="p-4 bg-slate-900 border border-slate-800 rounded-xl">
             <div class="flex items-center justify-between">
                 <div>
@@ -58,55 +58,62 @@
 
     <!-- Filters and Search -->
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-slate-300 mb-2">Cari Transaksi</label>
-                <div class="relative">
-                    <input type="text" id="search-input" placeholder="Cari keterangan, kategori..." class="block w-full p-3 pl-10 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
-                    <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+        <button id="toggle-filters" class="w-full sm:hidden flex items-center justify-between p-3 bg-slate-800 rounded-xl text-white mb-4">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-filter text-emerald-400"></i> Filter & Pencarian</span>
+            <i class="fa-solid fa-chevron-down text-slate-400"></i>
+        </button>
+        
+        <div id="filter-content" class="hidden sm:block space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="sm:col-span-2 lg:col-span-2">
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Cari Transaksi</label>
+                    <div class="relative">
+                        <input type="text" id="search-input" placeholder="Cari keterangan, kategori..." class="block w-full p-3 pl-10 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
+                        <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Jenis Transaksi</label>
+                    <select id="filter-type" class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
+                        <option value="">Semua Jenis</option>
+                        <option value="income">Pemasukan</option>
+                        <option value="expense">Pengeluaran</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Kategori</label>
+                    <select id="filter-category" class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
+                        <option value="">Semua Kategori</option>
+                        <option value="1">💰 Gaji / Pendapatan</option>
+                        <option value="2">🍔 Makanan & Minuman</option>
+                        <option value="3">🚗 Transportasi</option>
+                        <option value="4">🍿 Hiburan / Kebutuhan Hobi</option>
+                    </select>
                 </div>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-300 mb-2">Jenis Transaksi</label>
-                <select id="filter-type" class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
-                    <option value="">Semua Jenis</option>
-                    <option value="income">Pemasukan</option>
-                    <option value="expense">Pengeluaran</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-300 mb-2">Kategori</label>
-                <select id="filter-category" class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
-                    <option value="">Semua Kategori</option>
-                    <option value="1">💰 Gaji / Pendapatan</option>
-                    <option value="2">🍔 Makanan & Minuman</option>
-                    <option value="3">🚗 Transportasi</option>
-                    <option value="4">🍿 Hiburan / Kebutuhan Hobi</option>
-                </select>
-            </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-            <div>
-                <label class="block text-sm font-medium text-slate-300 mb-2">Tanggal Mulai</label>
-                <input type="date" id="filter-start-date" class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-300 mb-2">Tanggal Akhir</label>
-                <input type="date" id="filter-end-date" class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-300 mb-2">Urutkan</label>
-                <select id="sort-by" class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
-                    <option value="date_desc">Tanggal (Terbaru)</option>
-                    <option value="date_asc">Tanggal (Terlama)</option>
-                    <option value="amount_desc">Nominal (Tertinggi)</option>
-                    <option value="amount_asc">Nominal (Terendah)</option>
-                </select>
-            </div>
-            <div class="flex items-end">
-                <button id="apply-filters" class="w-full p-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-xl transition">
-                    Terapkan Filter
-                </button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Tanggal Mulai</label>
+                    <input type="date" id="filter-start-date" class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Tanggal Akhir</label>
+                    <input type="date" id="filter-end-date" class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Urutkan</label>
+                    <select id="sort-by" class="block w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
+                        <option value="date_desc">Tanggal (Terbaru)</option>
+                        <option value="date_asc">Tanggal (Terlama)</option>
+                        <option value="amount_desc">Nominal (Tertinggi)</option>
+                        <option value="amount_asc">Nominal (Terendah)</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button id="apply-filters" class="w-full p-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-xl transition">
+                        Terapkan Filter
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -133,7 +140,57 @@
 
     <!-- Transaction List View -->
     <div id="list-view" class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-        <div class="overflow-x-auto">
+        <!-- Mobile: Card-style List -->
+        <div class="block sm:hidden divide-y divide-slate-800/60">
+            {% for tx in transactions %}
+            <div class="p-4 hover:bg-slate-800/50 transition transaction-row" data-id="{{ tx.id }}">
+                <div class="flex items-start justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" class="transaction-checkbox rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-emerald-500" data-id="{{ tx.id }}">
+                        <div>
+                            <p class="text-sm font-semibold text-white">{{ tx.description if tx.description else 'Tanpa keterangan' }}</p>
+                            <p class="text-xs text-slate-400 mt-0.5">{{ tx.created_at.strftime('%d %b %Y') }}</p>
+                        </div>
+                    </div>
+                    <span class="text-sm font-bold {% if tx.type == 'income' %}text-teal-400{% else %}text-rose-400{% endif %}">
+                        {% if tx.type == 'income' %}+{% else %}-{% endif %}Rp {{ "{:,.0f}".format(tx.amount) }}
+                    </span>
+                </div>
+                <div class="flex items-center justify-between ml-6">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-500">
+                            {% if tx.category == '1' %}💰 Gaji
+                            {% elif tx.category == '2' %}🍔 Makanan
+                            {% elif tx.category == '3' %}🚗 Transport
+                            {% elif tx.category == '4' %}🍿 Hiburan
+                            {% else %}{{ tx.category }}
+                            {% endif %}
+                        </span>
+                        <span class="px-2 py-0.5 text-xs font-medium rounded {% if tx.type == 'income' %}bg-teal-500/10 text-teal-400{% else %}bg-rose-500/10 text-rose-400{% endif %}">
+                            {{ 'Masuk' if tx.type == 'income' else 'Keluar' }}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <a href="{{ url_for('edit_transaction', tx_id=tx.id) }}" class="p-2 text-slate-400 hover:text-emerald-400 transition">
+                            <i class="fa-solid fa-pen-to-square text-sm"></i>
+                        </a>
+                        <a href="{{ url_for('delete_transaction', tx_id=tx.id) }}" class="p-2 text-slate-500 hover:text-rose-500 transition"
+                           onclick="return confirm('Hapus transaksi ini?')">
+                            <i class="fa-solid fa-trash-can text-sm"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-12 text-slate-500">
+                <i class="fa-solid fa-folder-open text-4xl mb-3 block"></i>
+                <p class="text-base font-medium">Belum ada transaksi.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Desktop: Table View -->
+        <div class="hidden sm:block overflow-x-auto">
             <table class="w-full text-sm text-left text-slate-300">
                 <thead class="text-xs uppercase bg-slate-950 text-slate-400 border-b border-slate-800">
                     <tr>
@@ -141,7 +198,7 @@
                             <input type="checkbox" id="select-all" class="rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-emerald-500">
                         </th>
                         <th scope="col" class="px-6 py-4">Tanggal</th>
-                        <th scope="col" class="px-6 py-4">Keterangan / Catatan</th>
+                        <th scope="col" class="px-6 py-4">Keterangan</th>
                         <th scope="col" class="px-6 py-4">Kategori</th>
                         <th scope="col" class="px-6 py-4">Jenis</th>
                         <th scope="col" class="px-6 py-4">Nominal</th>
@@ -510,6 +567,19 @@
         searchInput.addEventListener('keyup', (e) => {
             if (e.key === 'Enter') applyFilters();
         });
+
+        // Toggle filters di mobile
+        const toggleFiltersBtn = document.getElementById('toggle-filters');
+        const filterContent = document.getElementById('filter-content');
+        
+        if (toggleFiltersBtn) {
+            toggleFiltersBtn.addEventListener('click', () => {
+                filterContent.classList.toggle('hidden');
+                const icon = toggleFiltersBtn.querySelector('i:last-child');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            });
+        }
 
         // Bulk selection
         selectAllCheckbox.addEventListener('change', function() {
