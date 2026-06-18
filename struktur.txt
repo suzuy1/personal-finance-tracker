@@ -1,0 +1,20 @@
+.
+├── app.py
+├── config.py
+├── models
+│   └── finance.py
+├── models.py
+├── struktur.txt
+└── templates
+    ├── auth.html
+    ├── base.html
+    ├── dashboard.html
+    ├── edit_transaction.html
+    ├── forgot_password.html
+    ├── reset_password.html
+    ├── test_dashboard.html
+    ├── test_transaction.html
+    ├── transaction_form.html
+    └── transactions.html
+
+3 directories, 15 files
