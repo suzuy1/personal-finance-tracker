@@ -79,6 +79,8 @@ Aplikasi pencatat keuangan pribadi berbasis web untuk mengelola pemasukan dan pe
 ├── erd.md                 # Entity Relationship Diagram (Mermaid)
 ├── struktur.txt           # Struktur direktori
 ├── README.md              # Dokumentasi proyek
+├── CONTRIBUTING.md        # Panduan kontribusi
+├── LICENSE                # Lisensi MIT
 ├── .gitignore             # File yang diabaikan Git
 │
 ├── instance/              # Folder untuk SQLite database
@@ -370,13 +372,13 @@ pip install -r requirements.txt
 app.run(debug=True, port=5001)
 ```
 
-## 📄 Lisensi
-
-Proyek ini menggunakan lisensi **MIT License** - silakan lihat file [LICENSE](LICENSE) untuk detail.
-
 ## 🤝 Kontribusi
 
 Silakan lihat [CONTRIBUTING.md](CONTRIBUTING.md) untuk panduan lengkap berkontribusi.
+
+## 📄 Lisensi
+
+Proyek ini menggunakan lisensi **MIT License** - silakan lihat file [LICENSE](LICENSE) untuk detail.
 
 ## 📞 Kontak
 
