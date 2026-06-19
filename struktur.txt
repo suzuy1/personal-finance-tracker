@@ -1,8 +1,11 @@
 .
 ├── app.py
 ├── config.py
+├── CONTRIBUTING.md
+├── erd.md
 ├── instance
 │   └── finance.db
+├── LICENSE
 ├── models.py
 ├── README.md
 ├── requirements.txt
@@ -17,4 +20,4 @@
     ├── transaction_form.html
     └── transactions.html
 
-4 directories, 18 files
+3 directories, 19 files
