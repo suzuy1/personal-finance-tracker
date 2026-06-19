@@ -317,13 +317,19 @@
 
 <style>
     .transaction-row.selected, .transaction-card.selected {
-        @apply bg-emerald-500/5 border-emerald-500/20;
+        background-color: rgba(16, 185, 129, 0.05);
+        border-color: rgba(16, 185, 129, 0.2);
     }
     .view-active {
-        @apply text-emerald-400 border-emerald-500;
+        color: #34d399;
+        border-color: #10b981;
     }
     .view-inactive {
-        @apply text-slate-400 border-slate-700 hover:text-white;
+        color: #94a3b8;
+        border-color: #334155;
+    }
+    .view-inactive:hover {
+        color: #ffffff;
     }
 </style>
 
