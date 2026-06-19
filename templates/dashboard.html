@@ -152,43 +152,60 @@
 
 {% block scripts %}
 <script>
-    var chartData = JSON.parse('{{ chart_data | tojson | safe }}');
-    var chartLabels = JSON.parse('{{ chart_labels | tojson | safe }}');
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            var chartData = JSON.parse('{{ chart_data | tojson | safe }}');
+            var chartLabels = JSON.parse('{{ chart_labels | tojson | safe }}');
 
-    var options = {
-        series: [{ name: 'Saldo Kekayaan', data: chartData }],
-        chart: { 
-            type: 'area', 
-            height: 300, 
-            toolbar: { show: false }, 
-            background: 'transparent',
-            dropShadow: { enabled: true, top: 4, blur: 6, left: 0, opacity: 0.2, color: '#10b981' }
-        },
-        colors: ['#10b981'],
-        theme: { mode: 'dark' },
-        stroke: { curve: 'smooth', width: 3 },
-        fill: {
-            type: 'gradient',
-            gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.0, stops: [0, 95, 100] }
-        },
-        dataLabels: { enabled: false },
-        xaxis: { 
-            categories: chartLabels,
-            labels: { style: { colors: '#64748b', font_family: 'Urbanist' } },
-            axisBorder: { show: false },
-            axisTicks: { show: false }
-        },
-        yaxis: {
-            labels: { 
-                style: { colors: '#64748b', font_family: 'Urbanist' },
-                formatter: function (val) { return "Rp " + val.toLocaleString() }
+            console.log('Chart Data:', chartData);
+            console.log('Chart Labels:', chartLabels);
+
+            var chartElement = document.querySelector("#chart-tren");
+            if (!chartElement) {
+                console.error('Elemen #chart-tren tidak ditemukan!');
+                return;
             }
-        },
-        grid: { borderColor: '#1e293b', strokeDashArray: 5 },
-        tooltip: { y: { formatter: function (val) { return "Rp " + val.toLocaleString() } } }
-    };
-    var chart = new ApexCharts(document.querySelector("#chart-tren"), options);
-    chart.render();
+
+            var options = {
+                series: [{ name: 'Saldo Kekayaan', data: chartData }],
+                chart: { 
+                    type: 'area', 
+                    height: 300, 
+                    toolbar: { show: false }, 
+                    background: 'transparent',
+                    dropShadow: { enabled: true, top: 4, blur: 6, left: 0, opacity: 0.2, color: '#10b981' }
+                },
+                colors: ['#10b981'],
+                theme: { mode: 'dark' },
+                stroke: { curve: 'smooth', width: 3 },
+                fill: {
+                    type: 'gradient',
+                    gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.0, stops: [0, 95, 100] }
+                },
+                dataLabels: { enabled: false },
+                xaxis: { 
+                    categories: chartLabels,
+                    labels: { style: { colors: '#64748b', fontFamily: 'Urbanist' } },
+                    axisBorder: { show: false },
+                    axisTicks: { show: false }
+                },
+                yaxis: {
+                    labels: { 
+                        style: { colors: '#64748b', fontFamily: 'Urbanist' },
+                        formatter: function (val) { return "Rp " + val.toLocaleString() }
+                    }
+                },
+                grid: { borderColor: '#1e293b', strokeDashArray: 5 },
+                tooltip: { y: { formatter: function (val) { return "Rp " + val.toLocaleString() } } }
+            };
+            
+            var chart = new ApexCharts(chartElement, options);
+            chart.render();
+            
+        } catch (error) {
+            console.error('Error membuat chart:', error);
+        }
+    });
 
     // SCRIPT APPLE CARD 3D MOUSE-TRACKING 
     const appleCard = document.querySelector("#apple-card");
