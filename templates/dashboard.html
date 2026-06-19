@@ -76,7 +76,7 @@
                 <span>Limit: Rp {{ "{:,.0f}".format(user.budget_limit) }}</span>
             </div>
             <div class="w-full bg-slate-950 rounded-full h-2.5 border border-white/5 p-[1px]">
-                <div class="h-full rounded-full transition-all duration-500 {% if budget_percentage >= 80 %}bg-gradient-to-r from-rose-500 to-red-600 animate-pulse{% else %}bg-gradient-to-r from-emerald-400 to-teal-500{% endif %}" style="width: {{ budget_percentage }}%; box-shadow: 0 0 15px {% if budget_percentage >= 80 %}#f43f5e{% else %}#10b981{% endif %};"></div>
+                <div id="budget-bar" class="h-full rounded-full transition-all duration-500 {% if budget_percentage >= 80 %}bg-gradient-to-r from-rose-500 to-red-600 animate-pulse{% else %}bg-gradient-to-r from-emerald-400 to-teal-500{% endif %}" style="width: {{ budget_percentage }}%" data-budget-exceeded="{{ 'true' if budget_percentage >= 80 else 'false' }}"></div>
             </div>
         </div>
 
@@ -209,5 +209,15 @@
         appleCard.style.transition = "all 0.5s ease-out";
     });
     appleCard.addEventListener("mouseenter", () => { appleCard.style.transition = "none"; });
+
+    // Budget bar glow effect
+    const budgetBar = document.querySelector("#budget-bar");
+    if (budgetBar) {
+        if (budgetBar.dataset.budgetExceeded === "true") {
+            budgetBar.style.boxShadow = "0 0 15px #f43f5e";
+        } else {
+            budgetBar.style.boxShadow = "0 0 15px #10b981";
+        }
+    }
 </script>
 {% endblock %}
