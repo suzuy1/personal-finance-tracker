@@ -76,7 +76,7 @@
                 <span>Limit: Rp {{ "{:,.0f}".format(user.budget_limit) }}</span>
             </div>
             <div class="w-full bg-slate-950 rounded-full h-2.5 border border-white/5 p-[1px]">
-                <div id="budget-bar" class="h-full rounded-full transition-all duration-500" style="width: {{ budget_percentage }}%" data-budget-exceeded="{{ 'true' if budget_percentage >= 80 else 'false' }}"></div>
+                <div id="budget-bar" class="h-full rounded-full transition-all duration-500" data-budget-exceeded="{{ 'true' if budget_percentage >= 80 else 'false' }}"></div>
             </div>
         </div>
 
@@ -213,6 +213,8 @@
     // Budget bar glow effect
     const budgetBar = document.querySelector("#budget-bar");
     if (budgetBar) {
+        var budgetPercentage = {{ budget_percentage }};
+        budgetBar.style.width = budgetPercentage + "%";
         if (budgetBar.dataset.budgetExceeded === "true") {
             budgetBar.classList.add("bg-gradient-to-r", "from-rose-500", "to-red-600", "animate-pulse");
             budgetBar.style.boxShadow = "0 0 15px #f43f5e";
