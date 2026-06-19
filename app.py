@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response
+from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response, jsonify
 import csv
 import io
 import re
 import logging
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from models import db, User, Income, Expense, Transaction
+from models import db, User, Income, Expense, Transaction, Category
 from config import Config
 
 app = Flask(__name__)
