@@ -193,7 +193,7 @@ erDiagram
 
 1. **Kloning Repositori**
    ```bash
-   git clone https://github.com/username/fintrack.git
+   git clone https://github.com/suzuy1/personal-finance-tracker.git
    cd fintrack
    ```
 
@@ -385,7 +385,7 @@ Proyek ini menggunakan lisensi **MIT License** - silakan lihat file [LICENSE](LI
 **Haykal Furqan Shafiq**
 - 🎓 Mahasiswa Ilmu Komputer (Semester 4)
 - 📍 Sabang, Aceh, Indonesia
-- 💻 GitHub: [@haykalfurqan](https://github.com/haykalfurqan)
+- 💻 GitHub: [@Haykal20](https://github.com/Haykal20)
 
 ## 🙏 Terima Kasih
 
@@ -397,14 +397,3 @@ Terima kasih telah menggunakan **FinTrack**! Semoga aplikasi ini membantu Anda m
 - **Enkapsulasi**: Protected attributes dan property
 - **Inheritance**: Transaction sebagai parent class
 - **Polymorphism**: Method abstract yang di-override di subclass
-
-### Roadmap Pengembangan
-- [ ] Multi-user dengan hak akses berbeda
-- [ ] Notifikasi email untuk budget hampir terlampaui
-- [ ] Integrasi dengan bank API
-- [ ] Progressive Web App (PWA) untuk offline
-- [ ] Laporan keuangan export PDF
-- [ ] Budget per kategori yang lebih detail
-- [ ] Recurring transactions (transaksi berulang)
-- [ ] Dark mode / Light mode toggle
-- [ ] Mobile app (React Native/Flutter)

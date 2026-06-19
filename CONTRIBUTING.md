@@ -24,13 +24,13 @@ Terima kasih atas minat Anda untuk berkontribusi dalam proyek **FinTrack**!
 
 ### 2. Clone Repository
 ```bash
-git clone https://github.com/username/fintrack.git
+git clone https://github.com/suzuy1/personal-finance-tracker.git
 cd fintrack
 ```
 
 ### 3. Tambahkan Upstream
 ```bash
-git remote add upstream https://github.com/haykalfurqan/fintrack.git
+git remote add upstream https://github.com/suzuy1/personal-finance-tracker.git
 ```
 
 ### 4. Buat Virtual Environment
@@ -278,7 +278,7 @@ def get_user_balance(user_id):
 
 ## ❓ Pertanyaan?
 
-Jika ada pertanyaan, buka [GitHub Discussions](https://github.com/haykalfurqan/fintrack/discussions) atau hubungi maintainers.
+Jika ada pertanyaan, buka [GitHub Discussions](https://github.com/suzuy1/personal-finance-tracker/discussions) atau hubungi maintainers.
 
 ---
 
