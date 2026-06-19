@@ -42,16 +42,36 @@ class User(db.Model):
 # ====================================================
 # 2. INHERITANCE: Parent Class untuk Skema Transaksi
 # ====================================================
+class Category(db.Model):
+    __tablename__ = 'categories'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    type = db.Column(db.String(20), nullable=False)  # 'income' atau 'expense'
+    icon = db.Column(db.String(10), default='📦')
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # NULL = default, ada value = custom user
+    is_default = db.Column(db.Boolean, default=False)
+    
+    # Relationship
+    user = db.relationship('User', backref='custom_categories')
+    
+    def __repr__(self):
+        return f'<Category {self.icon} {self.name}>'
+
+
 class Transaction(db.Model):
     __tablename__ = 'transactions'
     
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     amount = db.Column(db.Numeric(15, 2), nullable=False)
-    category = db.Column(db.String(50), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=True)
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     type = db.Column(db.String(20)) # Kolom pembeda kelas (discriminator)
+
+    # Relationship
+    category = db.relationship('Category', backref='transactions')
 
     __mapper_args__ = {
         'polymorphic_on': type,

@@ -27,6 +27,27 @@ limiter = Limiter(
 def initialize_database():
     db.create_all() # Otomatis update skema tabel SQLite nambah kolom password_hash
     
+    # Seed kategori default jika belum ada
+    if Category.query.count() == 0:
+        default_categories = [
+            # Income categories
+            Category(name='Gaji', type='income', icon='💰', is_default=True),
+            Category(name='Bonus', type='income', icon='🎁', is_default=True),
+            Category(name='Investasi', type='income', icon='📈', is_default=True),
+            Category(name='Hadiah', type='income', icon='🎉', is_default=True),
+            
+            # Expense categories
+            Category(name='Makanan & Minuman', type='expense', icon='🍔', is_default=True),
+            Category(name='Transportasi', type='expense', icon='🚗', is_default=True),
+            Category(name='Hiburan', type='expense', icon='🎮', is_default=True),
+            Category(name='Belanja', type='expense', icon='👕', is_default=True),
+            Category(name='Pendidikan', type='expense', icon='📚', is_default=True),
+            Category(name='Kesehatan', type='expense', icon='🏥', is_default=True),
+        ]
+        
+        db.session.add_all(default_categories)
+        db.session.commit()
+    
     # Proteksi Session Tampering / Invalidation setelah database dihapus/di-reset
     user_id = session.get('user_id')
     if user_id:
@@ -226,6 +247,47 @@ def transaction_list():
     
     return render_template('transactions.html', user=current_user, transactions=all_transactions)
 
+@app.route('/api/categories/<type>')
+def get_categories(type):
+    if 'user_id' not in session:
+        return {"error": "Unauthorized"}, 401
+    
+    # Kategori default + kategori custom user
+    categories = Category.query.filter(
+        (Category.type == type) & 
+        ((Category.is_default == True) | (Category.user_id == session['user_id']))
+    ).all()
+    
+    return jsonify([{
+        'id': c.id,
+        'name': c.name,
+        'icon': c.icon
+    } for c in categories])
+
+@app.route('/api/categories/add', methods=['POST'])
+def add_category():
+    if 'user_id' not in session:
+        return {"error": "Unauthorized"}, 401
+    
+    data = request.get_json()
+    
+    new_category = Category(
+        name=data['name'],
+        type=data['type'],
+        icon=data.get('icon', '📦'),
+        user_id=session['user_id'],
+        is_default=False
+    )
+    
+    db.session.add(new_category)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'category': {
+        'id': new_category.id,
+        'name': new_category.name,
+        'icon': new_category.icon
+    }})
+
 @app.route('/transaction/add', methods=['GET', 'POST'])
 def add_transaction():
     if 'user_id' not in session:
@@ -236,7 +298,7 @@ def add_transaction():
     if request.method == 'POST':
         tx_type = request.form.get('type')
         amount = request.form.get('amount')
-        category = request.form.get('category_id')
+        category_id = request.form.get('category_id')
         description = request.form.get('description')
 
         try:
@@ -251,10 +313,21 @@ def add_transaction():
                 flash('Nominal harus lebih dari 0!', 'error')
                 return redirect(url_for('add_transaction'))
 
+            # Validasi kategori
+            if not category_id:
+                flash('Pilih kategori terlebih dahulu!', 'error')
+                return redirect(url_for('add_transaction'))
+
+            # Cari kategori berdasarkan ID
+            category = Category.query.get(category_id)
+            if not category:
+                flash('Kategori tidak valid!', 'error')
+                return redirect(url_for('add_transaction'))
+
             if tx_type == 'income':
-                new_tx = Income(user_id=current_user.id, amount=amount_val, category=category, description=description)
+                new_tx = Income(user_id=current_user.id, amount=amount_val, category_id=category_id, description=description)
             elif tx_type == 'expense':
-                new_tx = Expense(user_id=current_user.id, amount=amount_val, category=category, description=description)
+                new_tx = Expense(user_id=current_user.id, amount=amount_val, category_id=category_id, description=description)
             else:
                 flash('Jenis transaksi tidak valid!', 'error')
                 return redirect(url_for('add_transaction'))
@@ -311,7 +384,7 @@ def edit_transaction(tx_id):
     if request.method == 'POST':
         new_type = request.form.get('type')
         new_amount = float(request.form.get('amount'))
-        new_category = request.form.get('category_id')
+        new_category_id = request.form.get('category_id')
         new_description = request.form.get('description')
 
         try:
@@ -334,7 +407,7 @@ def edit_transaction(tx_id):
                 
                 # Jika semua validasi saldo aman, terapkan perubahan & simpan
                 current_user.balance = new_balance
-                tx.category = new_category
+                tx.category_id = new_category_id
                 tx.description = new_description
                 db.session.commit()
                 return redirect(url_for('dashboard'))
@@ -387,7 +460,7 @@ def export_csv():
     writer = csv.writer(output_stream, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     
     # Tulis header CSV
-    writer.writerow(["Tanggal", "Keterangan", "Kategori ID", "Jenis", "Nominal"])
+    writer.writerow(["Tanggal", "Keterangan", "Kategori", "Jenis", "Nominal"])
     
     # Tulis baris data
     for tx in user_transactions:
@@ -395,7 +468,7 @@ def export_csv():
         writer.writerow([
             tx.created_at.strftime('%Y-%m-%d'),
             tx.description if tx.description else 'Tanpa keterangan',
-            tx.category,
+            tx.category.name if tx.category else 'Tanpa Kategori',
             jenis,
             float(tx.amount)
         ])
@@ -420,7 +493,7 @@ def search_transactions():
     # Parameter pencarian
     search_query = request.args.get('q', '')
     tx_type = request.args.get('type', '')
-    category = request.args.get('category', '')
+    category_id = request.args.get('category', '')
     start_date = request.args.get('start_date', '')
     end_date = request.args.get('end_date', '')
     sort_by = request.args.get('sort', 'date_desc')
@@ -434,7 +507,7 @@ def search_transactions():
     if search_query:
         query = query.filter(
             (Transaction.description.ilike(f'%{search_query}%')) |
-            (Transaction.category.ilike(f'%{search_query}%'))
+            (Transaction.category.has(Category.name.ilike(f'%{search_query}%')))
         )
     
     # Filter berdasarkan tipe
@@ -442,8 +515,8 @@ def search_transactions():
         query = query.filter(Transaction.type == tx_type)
     
     # Filter berdasarkan kategori
-    if category:
-        query = query.filter(Transaction.category == category)
+    if category_id:
+        query = query.filter(Transaction.category_id == category_id)
     
     # Filter berdasarkan tanggal
     if start_date:
@@ -471,7 +544,7 @@ def search_transactions():
             'id': tx.id,
             'type': tx.type,
             'amount': float(tx.amount),
-            'category': tx.category,
+            'category': tx.category.name if tx.category else 'Tanpa Kategori',
             'description': tx.description or 'Tanpa keterangan',
             'created_at': tx.created_at.strftime('%Y-%m-%d %H:%M:%S')
         })

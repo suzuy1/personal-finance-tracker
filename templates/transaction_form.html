@@ -11,7 +11,7 @@
     <div class="p-8 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl space-y-6">
         <div>
             <h2 class="text-2xl font-bold text-white tracking-tight">Catat Transaksi Baru</h2>
-            <p class="text-sm text-slate-400 mt-1">Silakan masukkan detail pemasukan atau pengeluaran Anda dengan benar.</p>
+            <p class="text-sm text-slate-400 mt-1">Silakan masukkan detail pemasukan atau pengeluaran Anda.</p>
         </div>
 
         <!-- Info Saldo Saat Ini -->
@@ -27,13 +27,13 @@
                     <label class="flex items-center justify-center gap-2 p-3.5 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:border-emerald-500/50 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-500/10 transition group">
                         <input type="radio" name="type" value="income" class="hidden" checked>
                         <i class="fa-solid fa-circle-arrow-down text-emerald-400"></i>
-                        <span class="text-sm font-medium text-slate-300 group-hover:text-white">Pemasukan (Income)</span>
+                        <span class="text-sm font-medium text-slate-300 group-hover:text-white">Pemasukan</span>
                     </label>
                     
                     <label class="flex items-center justify-center gap-2 p-3.5 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:border-rose-500/50 has-[:checked]:border-rose-500 has-[:checked]:bg-rose-500/10 transition group">
                         <input type="radio" name="type" value="expense" class="hidden">
                         <i class="fa-solid fa-circle-arrow-up text-rose-400"></i>
-                        <span class="text-sm font-medium text-slate-300 group-hover:text-white">Pengeluaran (Expense)</span>
+                        <span class="text-sm font-medium text-slate-300 group-hover:text-white">Pengeluaran</span>
                     </label>
                 </div>
             </div>
@@ -50,18 +50,40 @@
 
             <div>
                 <label for="category" class="block text-sm font-semibold text-slate-300 mb-2">Kategori</label>
-                <select id="category" name="category_id" required class="block w-full p-3.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
-                    <option value="" disabled selected class="text-slate-600">Pilih Kategori--</option>
-                    <option value="1">💰 Gaji / Pendapatan</option>
-                    <option value="2">🍔 Makanan & Minuman</option>
-                    <option value="3">🚗 Transportasi</option>
-                    <option value="4">🍿 Hiburan / Kebutuhan Hobi</option>
-                </select>
+                <div class="flex gap-2">
+                    <select id="category" name="category_id" required class="flex-1 block w-full p-3.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition">
+                        <!-- Kategori akan di-load via JavaScript -->
+                    </select>
+                    <button type="button" id="add-category-btn" class="px-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-slate-300 hover:text-white transition">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                </div>
             </div>
 
-            <div>
-                <label for="description" class="block text-sm font-semibold text-slate-300 mb-2">Keterangan / Catatan</label>
-                <textarea id="description" name="description" rows="3" class="block w-full p-3.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition" placeholder="Beli bakso urat pedas..."></textarea>
+            <!-- Form tambah kategori custom (hidden by default) -->
+            <div id="new-category-form" class="hidden p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-3">
+                <p class="text-sm font-semibold text-slate-300">Tambah Kategori Baru</p>
+                <div class="flex gap-2">
+                    <input type="text" id="new-category-name" placeholder="Nama kategori..." class="flex-1 p-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition">
+                    <select id="new-category-icon" class="p-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500 transition">
+                        <option value="📦">📦</option>
+                        <option value="💰">💰</option>
+                        <option value="🎁">🎁</option>
+                        <option value="📈">📈</option>
+                        <option value="🍔">🍔</option>
+                        <option value="🚗">🚗</option>
+                        <option value="🎮">🎮</option>
+                        <option value="👕">👕</option>
+                        <option value="📚">📚</option>
+                        <option value="🏥">🏥</option>
+                    </select>
+                    <button type="button" id="save-category-btn" class="px-4 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-white transition">
+                        <i class="fa-solid fa-check"></i>
+                    </button>
+                    <button type="button" id="cancel-category-btn" class="px-4 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 transition">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
             </div>
 
             <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-3.5 rounded-xl transition shadow-lg shadow-emerald-500/10">
@@ -72,28 +94,117 @@
 </div>
 
 <script>
+    // Elemen DOM
+    const typeRadios = document.querySelectorAll('input[name="type"]');
+    const categorySelect = document.getElementById('category');
+    const addCategoryBtn = document.getElementById('add-category-btn');
+    const newCategoryForm = document.getElementById('new-category-form');
+    const saveCategoryBtn = document.getElementById('save-category-btn');
+    const cancelCategoryBtn = document.getElementById('cancel-category-btn');
+    const newCategoryName = document.getElementById('new-category-name');
+    const newCategoryIcon = document.getElementById('new-category-icon');
+    
+    // Fungsi untuk load kategori berdasarkan type
+    async function loadCategories(type) {
+        try {
+            const response = await fetch(`/api/categories/${type}`);
+            const categories = await response.json();
+            
+            categorySelect.innerHTML = '<option value="" disabled selected class="text-slate-600">Pilih Kategori</option>';
+            
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.id;
+                option.textContent = `${cat.icon} ${cat.name}`;
+                categorySelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Gagal memuat kategori:', error);
+        }
+    }
+    
+    // Load kategori saat halaman dimuat (default: income)
+    document.addEventListener('DOMContentLoaded', () => {
+        loadCategories('income');
+    });
+    
+    // Event listener untuk perubahan jenis transaksi
+    typeRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            loadCategories(e.target.value);
+        });
+    });
+    
+    // Toggle form tambah kategori
+    addCategoryBtn.addEventListener('click', () => {
+        newCategoryForm.classList.toggle('hidden');
+        newCategoryName.focus();
+    });
+    
+    cancelCategoryBtn.addEventListener('click', () => {
+        newCategoryForm.classList.add('hidden');
+        newCategoryName.value = '';
+    });
+    
+    // Simpan kategori baru
+    saveCategoryBtn.addEventListener('click', async () => {
+        const name = newCategoryName.value.trim();
+        const icon = newCategoryIcon.value;
+        const type = document.querySelector('input[name="type"]:checked').value;
+        
+        if (!name) {
+            alert('Nama kategori harus diisi!');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/categories/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, icon, type })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Reload kategori dan pilih yang baru
+                await loadCategories(type);
+                categorySelect.value = result.category.id;
+                
+                // Reset dan sembunyikan form
+                newCategoryForm.classList.add('hidden');
+                newCategoryName.value = '';
+                
+                alert('Kategori berhasil ditambahkan!');
+            }
+        } catch (error) {
+            console.error('Gagal menambah kategori:', error);
+            alert('Gagal menambah kategori!');
+        }
+    });
+    
+    // Form validation
     document.getElementById('transaction-form').addEventListener('submit', function(e) {
         const amount = document.getElementById('amount').value;
         const type = document.querySelector('input[name="type"]:checked').value;
         const balance = parseFloat(document.getElementById('transaction-form').dataset.balance);
+        const category = categorySelect.value;
         
-        // Validasi nominal harus lebih dari 0
         if (!amount || parseFloat(amount) <= 0) {
             e.preventDefault();
             alert('Nominal harus lebih dari 0!');
             return false;
         }
         
-        // Validasi saldo jika pengeluaran
-        if (type === 'expense' && parseFloat(amount) > balance) {
+        if (!category) {
             e.preventDefault();
-            alert('Saldo tidak mencukupi untuk pengeluaran ini!');
+            alert('Pilih kategori terlebih dahulu!');
             return false;
         }
         
-        // Konfirmasi sebelum submit
-        if (!confirm('Apakah data transaksi sudah benar?')) {
+        if (type === 'expense' && parseFloat(amount) > balance) {
             e.preventDefault();
+            alert('Saldo tidak mencukupi untuk pengeluaran ini!');
             return false;
         }
         
