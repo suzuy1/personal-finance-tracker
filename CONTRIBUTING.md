@@ -1,6 +1,8 @@
-# 🤝 Panduan Kontribusi
+# 🤝 Panduan Kontribusi — FinTrack
 
 Terima kasih atas minat Anda untuk berkontribusi dalam proyek **FinTrack**! 
+
+FinTrack adalah aplikasi pencatat keuangan pribadi berbasis Flask yang menerapkan prinsip **OOP (Enkapsulasi, Inheritance, Polimorfisme)** dengan database SQLAlchemy dan antarmuka TailwindCSS.
 
 ## 📋 Daftar Isi
 
@@ -35,10 +37,13 @@ git remote add upstream https://github.com/suzuy1/personal-finance-tracker.git
 
 ### 4. Buat Virtual Environment
 ```bash
+# Linux/Mac
 python3 -m venv venv
-source venv/bin/activate  # Linux/Mac
-# atau
-venv\Scripts\activate  # Windows
+source venv/bin/activate
+
+# Windows
+python -m venv venv
+venv\Scripts\activate
 ```
 
 ### 5. Instal Dependensi
@@ -46,47 +51,59 @@ venv\Scripts\activate  # Windows
 pip install -r requirements.txt
 ```
 
+### 6. Buat File `.env` (Wajib!)
+Buat file `.env` di root proyek:
+```bash
+echo "SECRET_KEY=your-super-secret-key-here" > .env
+```
+> **Catatan:** Jangan commit file `.env` ke repository. Pastikan sudah masuk `.gitignore`.
+
+### 7. Jalankan Aplikasi (Test)
+```bash
+python app.py
+```
+Buka `http://localhost:5000` untuk memastikan semua berjalan lancar.
+
 ---
 
 ## 🌿 Branching Strategy
 
-### Jenis Branch
+Gunakan branch berikut untuk menjaga stabilitas kode:
 
 | Branch | Keterangan | Contoh |
 |--------|------------|--------|
 | `main` | Branch utama (stable) | - |
-| `develop` | Branch untuk development | - |
-| `feature/*` | Fitur baru | `feature/dark-mode` |
-| `fix/*` | Perbaikan bug | `fix/login-error` |
+| `develop` | Branch untuk pengembangan | - |
+| `feature/*` | Fitur baru | `feature/category-chart` |
+| `fix/*` | Perbaikan bug | `fix/balance-calculation` |
 | `docs/*` | Dokumentasi | `docs/update-readme` |
-| `refactor/*` | Refactor kode | `refactor/cleanup-routes` |
+| `refactor/*` | Refaktor kode (OOP improvement) | `refactor/polymorphism-logic` |
 
-### Workflow
-
+### Workflow Standar
 ```bash
-# 1. Pastikan selalu update dari upstream
+# 1. Update branch main dari upstream
 git fetch upstream
 git checkout main
 git merge upstream/main
 
-# 2. Buat branch baru dari main
+# 2. Buat branch fitur baru
 git checkout -b feature/nama-fitur
 
-# 3. Kerjakan perubahan dan commit
+# 3. Kerjakan perubahan & commit
 git add .
 git commit -m "feat: tambahkan fitur baru"
 
 # 4. Push ke fork Anda
 git push origin feature/nama-fitur
 
-# 5. Buka Pull Request di GitHub
+# 5. Buat Pull Request di GitHub
 ```
 
 ---
 
 ## 📝 Conventional Commits
 
-Format commit message:
+Gunakan format commit message yang konsisten:
 
 ```
 <type>(<scope>): <subject>
@@ -96,43 +113,38 @@ Format commit message:
 [optional footer]
 ```
 
-### Type
+### Tipe (Type) yang Tersedia
 
 | Type | Keterangan | Contoh |
 |------|------------|--------|
-| `feat` | Fitur baru | `feat(auth): tambahkan login dengan Google` |
-| `fix` | Perbaikan bug | `fix(dashboard): koreksi error grafik` |
-| `docs` | Dokumentasi | `docs: update README.md` |
-| `style` | Formatting (tidak mempengaruhi kode) | `style: perbaiki indentasi` |
-| `refactor` | Refactor kode | `refactor(models): optimasi query` |
-| `test` | Penambahan/pengubahan test | `test: tambahkan test login` |
-| `chore` | Maintenance | `chore: update dependencies` |
-| `perf` | Optimasi performa | `perf: cache query database` |
-| `ci` | CI/CD | `ci: tambahkan GitHub Actions` |
-| `build` | Build system | `build: tambahkan Dockerfile` |
+| `feat` | Fitur baru | `feat(transaction): tambahkan bulk delete` |
+| `fix` | Perbaikan bug | `fix(dashboard): koreksi perhitungan total expense` |
+| `docs` | Dokumentasi | `docs: update README dengan setup .env` |
+| `style` | Formatting (tidak mempengaruhi kode) | `style: perbaiki indentasi models.py` |
+| `refactor` | Refaktor kode | `refactor(models): optimasi query dengan eager loading` |
+| `test` | Penambahan/pengubahan test | `test: tambahkan unit test untuk Income.execute_financial_logic` |
+| `chore` | Maintenance (dependencies, config) | `chore: update Flask ke 3.1.3` |
+| `perf` | Optimasi performa | `perf: cache query kategori default` |
 
-### Scope (Opsional)
+### Scope yang Direkomendasikan
+- `auth` – Autentikasi (login, register, reset password)
+- `dashboard` – Halaman dashboard & grafik
+- `transaction` – CRUD transaksi, filter, export
+- `category` – Kategori default & custom
+- `models` – Model database (User, Transaction, Income, Expense, Category)
+- `api` – Endpoint RESTful (search, bulk, categories)
+- `templates` – Template HTML/Jinja2
+- `config` – Konfigurasi & environment variables
 
-- `auth` - Autentikasi
-- `dashboard` - Dashboard
-- `transaction` - Transaksi
-- `models` - Model database
-- `config` - Konfigurasi
-- `templates` - Template HTML
-
-### Contoh Lengkap
-
+### Contoh Commit Lengkap
 ```bash
-git commit -m "feat(auth): tambahkan rate limiting untuk login"
+git commit -m "feat(category): tambahkan endpoint API untuk kategori custom user
 
-git commit -m "fix(transaction): koreksi perhitungan saldo
+- Tambahkan route /api/categories/<type> untuk load kategori default + custom
+- Tambahkan route /api/categories/add untuk menyimpan kategori baru
+- Update transaction_form.html untuk support kategori custom via JavaScript
 
-- Perbaiki logika pengurangan saldo
-- Tambahkan validasi saldo mencukupi
-
-Closes #42"
-
-git commit -m "docs: tambahkan CONTRIBUTING.md"
+Closes #15"
 ```
 
 ---
@@ -140,115 +152,138 @@ git commit -m "docs: tambahkan CONTRIBUTING.md"
 ## 🔄 Pull Request Process
 
 ### Sebelum Membuat PR
-
-1. **Pastikan kode berjalan**
+1. **Pastikan aplikasi berjalan tanpa error**
    ```bash
    python app.py
    ```
-
-2. **Update dari upstream**
+2. **Update branch dengan upstream terbaru**
    ```bash
    git fetch upstream
    git rebase upstream/main
    ```
+3. **Pastikan semua test (jika ada) lolos**
+   ```bash
+   pytest
+   ```
+4. **Cek style code (flake8)**
+   ```bash
+   flake8 --select=E,W
+   ```
 
-3. **Tulis commit message yang jelas**
-
-### Format PR
-
+### Template Pull Request
 ```markdown
-## Deskripsi
-[Penjelasan singkat tentang perubahan]
+## 📌 Deskripsi
+[Penjelasan singkat tentang perubahan yang dilakukan]
 
-## Tipe Perubahan
+## 🏷️ Tipe Perubahan
 - [ ] 🐛 Bug Fix
 - [ ] ✨ Fitur Baru
 - [ ] 📝 Dokumentasi
 - [ ] 🎨 Style/UI
-- [ ] ♻️ Refactor
+- [ ] ♻️ Refactor (OOP)
 - [ ] ⚡ Performance
 
-## Screenshot (jika ada)
-[Upload screenshot perubahan UI]
+## 🧪 Testing
+- [ ] Sudah diuji secara lokal
+- [ ] Tidak merusak fitur existing (regression)
 
-## Checklist
+## 📸 Screenshot (jika ada perubahan UI)
+[Upload screenshot di sini]
+
+## ✅ Checklist
 - [ ] Kode berjalan tanpa error
-- [ ] Tidak ada print statement yang tertinggal
-- [ ] Komentar sudah ditambahkan jika diperlukan
-- [ ] Dokumentasi sudah diupdate (jika perlu)
+- [ ] Tidak ada `print()` atau `console.log()` yang tertinggal
+- [ ] Komentar sudah ditambahkan untuk logika kompleks (terutama polimorfisme)
+- [ ] Dokumentasi (README/CONTRIBUTING) sudah diupdate jika perlu
+- [ ] File `.env` tidak ter-commit
 ```
 
 ---
 
 ## 💻 Coding Standards
 
-### Python
-- Ikuti [PEP 8](https://peps.python.org/pep-0008/) style guide
-- Gunakan 4 spasi untuk indentasi
-- Maksimal 79 karakter per baris
-- Gunakan docstring untuk fungsi dan kelas
+### Python (PEP 8)
+- Gunakan **4 spasi** untuk indentasi
+- Maksimal **79 karakter** per baris (untuk komentar/docstring, 72 karakter)
+- Gunakan **docstring** untuk semua kelas dan fungsi publik
+
+#### Spesifik untuk Proyek FinTrack (OOP)
+- **Enkapsulasi**: Gunakan `@property` dan `@setter` untuk atribut yang dilindungi (contoh: `_balance` di model `User`).
+- **Inheritance & Polymorphism**: Pastikan method abstract (`execute_financial_logic`, `execute_reverse_logic`) diimplementasikan dengan benar di subclass (`Income`, `Expense`).
+- **Type Hints**: Sangat dianjurkan (minimal untuk fungsi publik).
 
 ```python
-def get_user_balance(user_id):
+# Contoh DOCSTRING dan Type Hints yang baik
+from typing import Union
+
+def calculate_new_balance(transaction: Transaction, current_balance: float) -> float:
     """
-    Mendapatkan saldo pengguna berdasarkan user_id.
+    Menghitung saldo baru berdasarkan jenis transaksi (income/expense).
     
     Args:
-        user_id (int): ID pengguna
-        
+        transaction (Transaction): Objek transaksi (Income atau Expense).
+        current_balance (float): Saldo saat ini.
+    
     Returns:
-        float: Saldo pengguna
-        
+        float: Saldo baru setelah transaksi diterapkan.
+    
     Raises:
-        UserNotFoundError: Jika pengguna tidak ditemukan
+        ValueError: Jika saldo tidak mencukupi untuk pengeluaran.
     """
-    pass
+    return transaction.execute_financial_logic(current_balance)
 ```
 
-### HTML/Jinja2
-- Gunakan 2 spasi untuk indentasi
-- Gunakan semantic HTML
-- Pastikan template responsive
+### HTML / Jinja2
+- Gunakan **2 spasi** untuk indentasi
+- Manfaatkan `{% block %}` dan `{% extends %}` untuk menghindari duplikasi
+- Pastikan aksesibilitas (label pada input, alt pada ikon)
 
 ### JavaScript
-- Gunakan `const` dan `let` (hindari `var`)
-- Gunakan camelCase untuk variabel dan fungsi
-- Tambahkan komentar untuk kode kompleks
+- Gunakan **`const`** dan **`let`** (hindari `var`)
+- Gunakan **camelCase** untuk variabel/fungsi
+- Gunakan **`async/await`** untuk request API (contoh: fetch ke `/api/transactions/search`)
+- Tambahkan komentar untuk fungsi yang kompleks
+
+### CSS / Tailwind
+- **Jangan** menulis custom CSS jika bisa menggunakan utility Tailwind
+- Simpan custom style di bagian `<style>` pada template atau file `.css` terpisah jika sangat diperlukan
 
 ### Git
 - Branch naming: `feature/nama-fitur`, `fix/nama-bug`
-- Commit message: Gunakan Conventional Commits
-- Satu commit untuk satu perubahan logis
+- Commit message: **wajib** mengikuti Conventional Commits
+- **Satu commit untuk satu perubahan logis** (jangan gabung refactor + bug fix dalam 1 commit)
 
 ---
 
 ## 🐛 Laporan Bug
 
 ### Template Laporan Bug
-
 ```markdown
-## Deskripsi Bug
+## 🐛 Deskripsi Bug
 [Penjelasan singkat tentang bug]
 
-## Steps to Reproduce
-1. Buka halaman '...'
-2. Klik tombol '...'
-3. Scroll ke '...'
+## 🔄 Steps to Reproduce
+1. Login sebagai user
+2. Buka halaman 'Transaksi'
+3. Klik 'Export CSV'
 4. Error muncul
 
-## Expected Behavior
-[Seharusnya apa yang terjadi]
+## ✅ Expected Behavior
+[Seharusnya file CSV terunduh]
 
-## Actual Behavior
-[Apa yang sebenarnya terjadi]
+## ❌ Actual Behavior
+[Error 500 atau file corrupt]
 
-## Screenshots
+## 📷 Screenshots
 [Jika ada, upload screenshot]
 
-## Environment
-- OS: [contoh: Windows 11]
-- Browser: [contoh: Chrome 120]
-- Python Version: [contoh: 3.11]
+## 💻 Environment
+- OS: [Windows 11 / Ubuntu 22.04]
+- Browser: [Chrome 120]
+- Python Version: [3.11]
+
+## 🔍 Log Error (jika ada)
+[Tempelkan traceback error di sini]
 ```
 
 ---
@@ -256,32 +291,42 @@ def get_user_balance(user_id):
 ## 💡 Feature Request
 
 ### Template Feature Request
-
 ```markdown
-## Deskripsi Fitur
-[Penjelasan singkat tentang fitur yang diinginkan]
+## 💡 Deskripsi Fitur
+[Jelaskan fitur yang diinginkan]
 
-## Use Case
-[Mengapa fitur ini dibutuhkan?]
+## 🎯 Use Case
+[Mengapa fitur ini dibutuhkan? Siapa yang akan menggunakannya?]
 
-## Proposed Solution
-[Bagaimana Anda bayangkan fitur ini bekerja]
+## 🛠️ Proposed Solution
+[Bagaimana fitur ini bekerja? Berikan gambaran teknis sederhana]
 
-## Alternatives Considered
-[Alternatif lain yang pernah dipertimbangkan]
+## 🔄 Alternatif Lain
+[Pendekatan lain yang pernah dipertimbangkan]
 
-## Additional Context
-[Konteks tambahan jika ada]
+## 📝 Konteks Tambahan
+[Screenshot, referensi, atau contoh dari aplikasi lain]
 ```
 
 ---
 
-## ❓ Pertanyaan?
+## 🧪 OOP Rules (Khusus untuk Proyek ini)
 
-Jika ada pertanyaan, buka [GitHub Discussions](https://github.com/suzuy1/personal-finance-tracker/discussions) atau hubungi maintainers.
+Karena proyek ini adalah tugas akhir **Pemrograman Berorientasi Objek**, kontribusi wajib memperhatikan aturan berikut:
+
+1. **Jangan merusak prinsip Enkapsulasi** – Atribut seperti `_balance` harus tetap diakses via `@property`.
+2. **Jangan menghilangkan Inheritance** – Semua transaksi harus mewarisi dari `Transaction`.
+3. **Jangan menghilangkan Polymorphism** – Setiap subclass (`Income`, `Expense`) harus mengimplementasikan method `execute_financial_logic` dan `execute_reverse_logic`.
+4. **Tambahkan validasi** – Setiap perubahan logika keuangan harus memiliki validasi (misal: saldo tidak boleh negatif).
+
+---
+
+## ❓ Ada Pertanyaan?
+
+Jika ada pertanyaan, silakan buka [GitHub Discussions](https://github.com/suzuy1/personal-finance-tracker/discussions) atau hubungi maintainers.
 
 ---
 
 ## 🙏 Terima Kasih!
 
-Kontribusi Anda sangat berharga. Terima kasih sudah membantu mengembangkan **FinTrack**! 🚀
+Kontribusi Anda sangat berharga. Terima kasih sudah membantu mengembangkan **FinTrack** dan mempraktikkan **PBO** dengan baik! 🚀
