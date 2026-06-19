@@ -20,7 +20,7 @@
             <p class="text-xl font-bold text-emerald-400">Rp {{ "{:,.0f}".format(user.balance) }}</p>
         </div>
 
-        <form action="{{ url_for('add_transaction') }}" method="POST" class="space-y-5" id="transaction-form">
+        <form action="{{ url_for('add_transaction') }}" method="POST" class="space-y-5" id="transaction-form" data-balance="{{ user.balance }}">
             <div>
                 <label class="block text-sm font-semibold text-slate-300 mb-2">Jenis Transaksi</label>
                 <div class="grid grid-cols-2 gap-4">
@@ -75,7 +75,7 @@
     document.getElementById('transaction-form').addEventListener('submit', function(e) {
         const amount = document.getElementById('amount').value;
         const type = document.querySelector('input[name="type"]:checked').value;
-        const balance = {{ user.balance }};
+        const balance = parseFloat(document.getElementById('transaction-form').dataset.balance);
         
         // Validasi nominal harus lebih dari 0
         if (!amount || parseFloat(amount) <= 0) {
